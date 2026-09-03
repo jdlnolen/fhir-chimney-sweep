@@ -51,8 +51,9 @@ material finding was identified within that review scope.
   of its inventory, clinical validity, or whether a claimed validator actually ran.
 - There is no configured static type checker or lint tool. Syntax compilation,
   automated tests, native manifest validation, and manual inspection are used.
-- Generated samples, local environment paths, prior user reports, and downloaded
-  FHIR content are not part of the public package.
+- At initial packaging, generated samples, local environment paths, prior user
+  reports, and downloaded FHIR content were not part of the public package.
+  The sample-report update below records the subsequently added public sample.
 - The shared fixture intentionally retains `DOCX visual QA: not-run`: generating
   it on another machine is not automatically a visually verified result.
 
@@ -62,3 +63,35 @@ and coverage. Missing skills, mismatched content IDs, invented findings, or
 unreported coverage gaps should block reliance on the report and be filed as
 issues with a public or synthetic reproduction. Repository owner controls
 merges and releases.
+
+## Observation sample update - 2026-09-03
+
+The shared plugin now includes unchanged Markdown and Word copies of the
+completed September 3 Observation sweep, with provenance, limitations, and
+SHA-256 checksums. The root README and skill entrypoint link to the sample.
+Only the final report pair is bundled, not task-local evidence, working JSON,
+rendered pages, or tool logs. This adds a real-run illustration; it does not
+establish independent review accuracy or fresh-session parity between hosts.
+
+The original report's matching content ID is `c87d13fc58ef7836`. The Word file
+had all 49 pages rendered and visually inspected during that review; unchanged
+file hashes preserve that artifact, without claiming a new rendering run here.
+Formal FHIR validation, comprehensive terminology validation, and a fresh
+Publisher build remain unrun for that report.
+
+Regression tests cover sample-file checksums, paired filenames/content IDs,
+Word ZIP integrity, and the existing self-contained plugin reference checks.
+These are packaging checks, not a repeated FHIR review. At the end of the
+documentation-edit step, plugin version and release/install state were unchanged.
+
+Update verification: all 23 automated tests pass; Codex plugin/skill validators
+and Claude Code strict marketplace/plugin validators pass. README links resolve,
+the two report files match their original SHA-256 checksums, and the Word package
+contains 131 HTTPS links with no local filesystem paths or user metadata markers
+found by the targeted check. `git diff --check` passes. That edit step did not
+perform a release, remote push, or installed-plugin refresh.
+
+The subsequent commit/push/install request uses matching native manifest versions
+`0.1.0+codex.20260903143253` to refresh the local plugin caches while preserving
+the `0.1.0` base version. This cache-busting suffix is not a new FHIR review or a
+semantic-version feature release.

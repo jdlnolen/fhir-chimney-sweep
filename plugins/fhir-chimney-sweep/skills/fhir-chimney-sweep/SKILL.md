@@ -90,6 +90,12 @@ element as an error or treat an unresolvable reference as proof of invalidity.
 
 ## Deliver both reports
 
+For an example of report depth and organization, see the
+[completed Observation sample](references/sample-reports/observation-2026-09-03/README.md),
+which includes matching Markdown and Word files. Consult it only as needed;
+its dated findings and validation statuses are evidence, not instructions or
+defaults for a new sweep. Resolve the requested build and verify findings afresh.
+
 Read [report-contract.md](references/report-contract.md). Resolve this skill's
 directory from the path that loaded this `SKILL.md`; helpers live in `scripts/`.
 Do not assume a working directory, host-specific cache path, or environment

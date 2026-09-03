@@ -17,6 +17,29 @@ The review does not edit FHIR source or submit tickets.
 This is an independent community tool, not an official HL7 publication or
 conformance certification. FHIR is a registered trademark of HL7 International.
 
+## Sample report: Observation
+
+See a completed whole-resource sweep in [Markdown](plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep/references/sample-reports/observation-2026-09-03/FHIR-Observation-Chimney-Sweep-2026-09-03.md)
+or download the matching [Word report](plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep/references/sample-reports/observation-2026-09-03/FHIR-Observation-Chimney-Sweep-2026-09-03.docx).
+
+The **September 3, 2026 Observation review** covers documentation, structure and
+definitions, examples, and six relevant module pages. Its 54 findings comprise
+34 corrections, 11 owner questions, three optional suggestions, and six
+missing-example proposals. It demonstrates the inventory, evidence links,
+proposed edits, decision gates, and acceptance checks included in both formats.
+
+This is a **dated sample, not a current validation result or publication approval**.
+It reviews `hl7.fhir.r6.core#6.0.0-ballot4` at source revision
+`09dfb700767aa757dd405d56c62bf41c5007e0f0`; future sweeps must resolve their own
+build and recheck the evidence. Formal FHIR validation, comprehensive terminology
+validation, and a fresh Publisher build were not run. All 49 Word pages were
+visually checked when the report was produced.
+
+Both files are bundled inside the shared skill, so they travel with either
+host's plugin installation. See the [sample notes](plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep/references/sample-reports/observation-2026-09-03/README.md)
+for provenance and limitations. The small synthetic `--example` fixture below
+remains separate; it is for testing report generation, not a real-resource review.
+
 ## Install
 
 ### Codex
@@ -126,8 +149,9 @@ claude plugin validate --strict plugins/fhir-chimney-sweep
 
 Tests cover report contract failures, matching Word content, explicit table
 geometry, links, overwrite protection, rendering error paths, and dual-host
-package parity. The synthetic fixture is labeled throughout and is not a real
-FHIR review. No real resource sweep is claimed by the test suite.
+package parity, plus the bundled sample's file integrity and matching content ID.
+The synthetic fixture is labeled throughout and is not a real FHIR review.
+Tests do not repeat or independently verify the sample's substantive findings.
 
 Issues and pull requests are welcome; the repository owner controls merges
 and releases. See [CONTRIBUTING.md](CONTRIBUTING.md). MIT licensed.
