@@ -1,0 +1,47 @@
+import hashlib
+from pathlib import Path
+import re
+import unittest
+from zipfile import ZipFile
+
+from docx import Document
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SAMPLES = ROOT / 'plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep/references/sample-reports'
+
+
+class SampleReportTests(unittest.TestCase):
+    def test_dated_samples_preserve_both_report_files(self):
+        samples = sorted(SAMPLES.glob('*/SHA256SUMS'))
+        self.assertTrue(samples, 'At least one dated sample must be bundled')
+        for manifest in samples:
+            with self.subTest(sample=manifest.parent.name):
+                entries = [line.split(maxsplit=1) for line in manifest.read_text().splitlines()]
+                self.assertEqual(len(entries), 2)
+                self.assertEqual({Path(name).suffix for _, name in entries}, {'.md', '.docx'})
+                for expected, name in entries:
+                    self.assertEqual(Path(name).name, name, 'Sample filenames must be local')
+                    data = (manifest.parent / name).read_bytes()
+                    self.assertEqual(hashlib.sha256(data).hexdigest(), expected, name)
+                self.assertEqual(len({Path(name).stem for _, name in entries}), 1)
+
+    def test_samples_have_matching_content_ids_and_valid_word_packages(self):
+        reports = sorted(SAMPLES.glob('*/*.docx'))
+        self.assertTrue(reports)
+        for word_path in reports:
+            with self.subTest(sample=word_path.parent.name):
+                markdown = word_path.with_suffix('.md').read_text()
+                md_id = re.search(r'Report content ID: ([0-9a-f]{16})\b', markdown)
+                self.assertIsNotNone(md_id)
+                with ZipFile(word_path) as package:
+                    self.assertIsNone(package.testzip())
+                    self.assertIn('word/document.xml', package.namelist())
+                text = '\n'.join(p.text for p in Document(word_path).paragraphs)
+                word_id = re.search(r'Report content ID: ([0-9a-f]{16})\b', text)
+                self.assertIsNotNone(word_id)
+                self.assertEqual(md_id.group(1), word_id.group(1))
+
+
+if __name__ == '__main__':
+    unittest.main()
