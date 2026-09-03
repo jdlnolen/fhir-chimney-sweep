@@ -1,0 +1,9 @@
+{
+  "name": "fhir-chimney-sweep",
+  "version": "0.1.0",
+  "description": "Review FHIR resource documentation, examples, and module pages; produce matching Markdown and Word reports.",
+  "author": {"name": "JD"},
+  "repository": "https://github.com/jdlnolen/fhir-chimney-sweep",
+  "license": "MIT",
+  "keywords": ["fhir", "hl7", "quality-review", "documentation", "examples"]
+}

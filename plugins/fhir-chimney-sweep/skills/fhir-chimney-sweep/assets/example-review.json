@@ -1,0 +1,33 @@
+{
+  "resource": "ExampleResource",
+  "fhir_version": "SYNTHETIC - not a FHIR release",
+  "package": "SYNTHETIC format fixture",
+  "build_url": "https://example.org/synthetic-spec",
+  "source_revision": "SYNTHETIC fixture v1",
+  "review_date": "2026-09-03",
+  "scope": "SYNTHETIC report-format demonstration. No actual FHIR resource was reviewed.",
+  "summary": "Illustrates one correction and one missing-example suggestion in a paired report. These are not findings about FHIR.",
+  "recommendation": "Changes required",
+  "limitations": ["Synthetic input tests report structure and rendering, not reviewer accuracy or FHIR conformance."],
+  "sources": [
+    {"id": "S1", "title": "Synthetic definition", "url": "https://example.org/synthetic-spec#definition", "version": "Fixture v1", "locator": "ExampleResource.status"},
+    {"id": "S2", "title": "Synthetic example and module", "url": "https://example.org/synthetic-spec#example", "version": "Fixture v1", "locator": "Example one; module overview"}
+  ],
+  "inventory": [
+    {"area": "Documentation", "artifact": "Scope and definition", "status": "reviewed", "note": "Synthetic definition requires status.", "source_ids": ["S1"], "finding_ids": []},
+    {"area": "Examples", "artifact": "Example one", "status": "reviewed", "note": "One synthetic example. Its status is missing.", "source_ids": ["S2"], "finding_ids": ["EX-01", "NEW-01"]},
+    {"area": "Module", "artifact": "Overview", "status": "reviewed", "note": "Synthetic module discusses completed and cancelled events.", "source_ids": ["S2"], "finding_ids": ["NEW-01"]}
+  ],
+  "findings": [
+    {"id": "EX-01", "area": "Examples", "kind": "Correction", "priority": "P1", "title": "Required status is absent (synthetic)", "location": "Example one: status", "evidence": "The synthetic definition requires status; the synthetic example omits it.", "source_ids": ["S1", "S2"], "proposed_change": "Add the status that accurately represents this example's lifecycle.", "replacement": "Owner decision required: choose the supported status for the intended lifecycle.\nDo not infer that a missing status means completed.", "rationale": "The example should demonstrate the declared structural contract.", "validation": "Check cardinality, allowed value, and narrative agreement after the owner supplies intent.", "dependencies": [], "decision": "Owner to confirm lifecycle intent."},
+    {"id": "NEW-01", "area": "Examples", "kind": "Missing example", "priority": "P2", "title": "Cancelled-event example (synthetic)", "location": "Example index and module overview", "evidence": "The synthetic module discusses cancellation, but the fixture includes no cancelled scenario.", "source_ids": ["S2"], "proposed_change": "Consider adding a focused cancelled-event example and link it from the module.", "replacement": "Minimum content: supported cancelled status, coherent subject and dates, and matching narrative. Use only fields supported by the synthetic definition.", "rationale": "This would illustrate the module's lifecycle distinction.", "validation": "Validate supported fields and compare the scenario with the module text.", "dependencies": ["EX-01"], "decision": "Optional editorial improvement; not a normative requirement."}
+  ],
+  "checks": [
+    {"name": "FHIR validator", "status": "not-applicable", "details": "Synthetic fixture, not a FHIR resource."},
+    {"name": "Publisher", "status": "not-applicable", "details": "No FHIR publication was built."},
+    {"name": "Terminology", "status": "not-applicable", "details": "No real clinical terminology is asserted."},
+    {"name": "Semantic review", "status": "passed", "details": "Internal synthetic fixture consistency only."},
+    {"name": "DOCX visual QA", "status": "not-run", "details": "Render and inspect every generated page before recording visual verification."}
+  ],
+  "acceptance": ["Resolve the synthetic owner decision before selecting a replacement status.", "Keep the two report formats synchronized after any finding changes."]
+}

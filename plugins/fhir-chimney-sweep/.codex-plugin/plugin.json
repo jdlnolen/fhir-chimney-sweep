@@ -1,0 +1,21 @@
+{
+  "name": "fhir-chimney-sweep",
+  "version": "0.1.0",
+  "description": "Review FHIR resource documentation, examples, and module pages for continuity; produce matching Markdown and Word reports.",
+  "author": {
+    "name": "JD"
+  },
+  "skills": "./skills/",
+  "repository": "https://github.com/jdlnolen/fhir-chimney-sweep",
+  "license": "MIT",
+  "keywords": ["fhir", "hl7", "quality-review", "documentation", "examples"],
+  "interface": {
+    "displayName": "FHIR-chimney-sweep",
+    "shortDescription": "Check FHIR documentation, examples, and module consistency.",
+    "longDescription": "Perform an evidence-backed continuity review of one FHIR resource against its structure and definitions, examples, and relevant module pages. Produce one Markdown report and one matching Word report with corrections, editorial suggestions, missing examples, decision gates, and acceptance checks. Does not modify FHIR source or submit tickets.",
+    "developerName": "JD",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": ["Sweep Observation in the current FHIR build and create Markdown and Word review reports."]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "fhir-chimney-sweep",
+  "interface": {"displayName": "FHIR Chimney Sweep"},
+  "plugins": [{
+    "name": "fhir-chimney-sweep",
+    "source": {"source": "local", "path": "./plugins/fhir-chimney-sweep"},
+    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "category": "Productivity"
+  }]
+}

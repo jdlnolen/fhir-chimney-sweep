@@ -1,0 +1,4 @@
+interface:
+  display_name: "FHIR-chimney-sweep"
+  short_description: "Review FHIR documentation, examples, and module continuity"
+  default_prompt: "Use $fhir-chimney-sweep to review Observation in the current FHIR build and produce matching Markdown and Word reports."
