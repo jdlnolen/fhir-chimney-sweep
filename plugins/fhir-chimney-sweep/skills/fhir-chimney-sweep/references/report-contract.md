@@ -30,13 +30,16 @@ The JSON object contains exactly these keys:
   Status: `reviewed`, `not-reviewed`, `excluded`. The two ID fields are lists of
   strings. Include at least one row for each of the first three areas. If no
   module applies, make an excluded Module row with the search/rationale.
-- `findings`: objects with `id`, `area`, `kind`, `priority`, `title`, `location`,
-  `evidence`, `source_ids`, `proposed_change`, `replacement`, `rationale`,
-  `validation`, `dependencies`, `decision`. All are strings except `source_ids`
-  and `dependencies` (ID lists). `kind`: `Correction`, `Suggestion`, `Question`,
-  `Missing example`. Priority: `P1`, `P2`, `P3`. P1 requires a Correction.
-  Missing-example findings use Examples and describe scenario/minimum content
-  in `replacement`. Cite evidence even for suggestions or coverage gaps.
+- `findings`: objects with `id`, `area`, `kind`, `priority`,
+  `change_classification`, `title`, `location`, `evidence`, `source_ids`,
+  `proposed_change`, `replacement`, `rationale`, `validation`, `dependencies`,
+  `decision`. All are strings except `source_ids` and `dependencies` (ID lists).
+  `kind`: `Correction`, `Suggestion`, `Question`, `Missing example`. Priority:
+  `P1`, `P2`, `P3`; P1 requires a Correction. `change_classification`: `Must fix
+  (implementation or testing impact)`, `Minor fix`, or `Net new addition`.
+  Missing-example findings use Examples, are Net new additions, and describe
+  scenario/minimum content in `replacement`. Cite evidence even for suggestions
+  or coverage gaps.
 - `checks`: objects with `name`, `status`, `details`. Include named checks
   `FHIR validator`, `Publisher`, `Terminology`, `Semantic review`, `DOCX visual QA`.
   Status: `passed`, `failed`, `not-run`, `not-applicable`. Give actual versions,
@@ -66,12 +69,15 @@ reviewer judgment; schema checks cannot establish completeness by themselves.
 ## Output layout
 
 One consolidated report per resource, with: recommendation/build identity and
-triage; scope and method; review inventory; documentation changes; example
-changes; module changes; cross-layer changes; suggested missing examples;
-verification performed; acceptance checklist; limitations and human decisions;
-and sources. Findings use labeled paragraphs rather than enormous table cells.
-Inventory uses compact comparable columns followed by evidence/notes. Finding
-IDs and source IDs are identical in both files. Source URLs are clickable.
+triage; change-classification definitions and counts; scope and method; review
+inventory; detailed findings; verification performed; acceptance checklist;
+limitations and human decisions; and sources. The detailed list is organized
+first by change classification (`Must fix`, `Minor fix`, `Net new addition`),
+then by area (Documentation, Examples, Module, Cross-layer, Suggested missing
+examples), then by numeric finding ID within that area. Empty groups are omitted.
+Findings use labeled paragraphs rather than enormous table cells. Inventory
+uses compact comparable columns followed by evidence/notes. Finding IDs and
+source IDs are identical in both files. Source URLs are clickable.
 
 The Word design uses the compact-reference-guide page/type rhythm: Letter,
 1-inch margins, Calibri 11 pt, 1.25 line spacing, blue real heading styles,

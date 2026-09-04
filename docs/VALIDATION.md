@@ -95,3 +95,44 @@ The subsequent commit/push/install request uses matching native manifest version
 `0.1.0+codex.20260903143253` to refresh the local plugin caches while preserving
 the `0.1.0` base version. This cache-busting suffix is not a new FHIR review or a
 semantic-version feature release.
+
+## Classification ordering update - 2026-09-04
+
+Version: 0.1.1. The report contract and compiler now require every finding to
+have one of three change classifications: `Must fix (implementation or testing
+impact)`, `Minor fix`, or `Net new addition`. Must fix is limited to content that
+materially impairs implementation or test design. Clinically implausible values
+and internally inconsistent example data remain minor fixes unless the same
+finding also contains such a blocker. Missing examples are always net new
+additions.
+
+Detailed findings are now grouped first by change classification, then by report
+area, and finally by numeric finding ID within each area. Empty groups are
+omitted. Finding type (`Correction`, `Suggestion`, `Question`, or `Missing
+example`) and P1/P2/P3 priority remain separate metadata. Markdown and Word use
+the same grouping and content model, and Word finding titles are real Heading 3
+paragraphs.
+
+The bundled Observation sample demonstrates the revised contract across all 54
+findings: 27 must-fix items, 17 minor fixes, and 10 net new additions. Its revised
+Markdown and Word files retain matching content ID `c8b1e82d9f3e15be`. All 51
+Word pages were rendered and visually inspected during the classification
+revision. This is a reorganization and classification of the dated September 3
+review, not a fresh FHIR sweep; its recorded source, evidence limitations, and
+unrun formal validation steps remain unchanged.
+
+Automated tests now cover allowed classifications, the missing-example rule,
+classification/area/numeric-ID ordering, Word heading levels, and the shipped
+sample's classification totals and order. The full suite passes 26 tests. A
+fresh synthetic report was rendered to four pages and every page was inspected;
+no clipping, overlap, split table rows, or hierarchy defect was found. The
+fixture truthfully retains `DOCX visual QA: not-run` because generation alone
+does not confer visual-QA status on later runs.
+
+Update verification: all 26 automated tests pass with the bundled document
+runtime; Codex skill and plugin validators pass; Claude Code strict marketplace
+and plugin validation pass; and the bundled Observation checksums verify. A
+targeted source scan found no task-local filesystem paths in the packaged text.
+`git diff --check` passes. These checks validate the report contract, generated
+artifacts, and plugin packaging; they do not independently establish the
+substantive accuracy or completeness of the dated Observation review.

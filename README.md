@@ -25,15 +25,19 @@ or download the matching [Word report](plugins/fhir-chimney-sweep/skills/fhir-ch
 The **September 3, 2026 Observation review** covers documentation, structure and
 definitions, examples, and six relevant module pages. Its 54 findings comprise
 34 corrections, 11 owner questions, three optional suggestions, and six
-missing-example proposals. It demonstrates the inventory, evidence links,
-proposed edits, decision gates, and acceptance checks included in both formats.
+missing-example proposals. By change classification, it contains 27 must-fix
+items with implementation or testing impact, 17 minor fixes, and 10 net new
+additions. It demonstrates the inventory, evidence links, proposed edits,
+decision gates, and acceptance checks included in both formats.
 
 This is a **dated sample, not a current validation result or publication approval**.
 It reviews `hl7.fhir.r6.core#6.0.0-ballot4` at source revision
 `09dfb700767aa757dd405d56c62bf41c5007e0f0`; future sweeps must resolve their own
 build and recheck the evidence. Formal FHIR validation, comprehensive terminology
 validation, and a fresh Publisher build were not run. All 49 Word pages were
-visually checked when the report was produced.
+visually checked when the original report was produced. The September 4
+classification revision reorganized the same 54 findings and all 51 revised
+Word pages were rendered and visually inspected.
 
 Both files are bundled inside the shared skill, so they travel with either
 host's plugin installation. See the [sample notes](plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep/references/sample-reports/observation-2026-09-03/README.md)
@@ -99,6 +103,13 @@ The report distinguishes **corrections**, **suggestions**, **questions**, and
 clinical values, element names, and intent are not invented to fill gaps.
 Unresolved conflicts become owner decisions, not unsupported corrections.
 
+Every finding also has a separate change classification: **must fix
+(implementation or testing impact)**, **minor fix**, or **net new addition**.
+Must fix is reserved for content that materially impairs implementation or test
+design. Implausible clinical values and internally inconsistent example data
+are minor fixes unless the same finding also contains such a blocker. Reports
+list findings by change classification first, then area, then numeric finding ID.
+
 ## Report tooling
 
 The compiler is a formatting and consistency helper, **not a FHIR validator**.
@@ -148,10 +159,11 @@ claude plugin validate --strict plugins/fhir-chimney-sweep
 ```
 
 Tests cover report contract failures, matching Word content, explicit table
-geometry, links, overwrite protection, rendering error paths, and dual-host
-package parity, plus the bundled sample's file integrity and matching content ID.
-The synthetic fixture is labeled throughout and is not a real FHIR review.
-Tests do not repeat or independently verify the sample's substantive findings.
+geometry, links, overwrite protection, rendering error paths, change-classification
+validation and ordering, and dual-host package parity, plus the bundled sample's
+file integrity, matching content ID, and classification order. The synthetic
+fixture is labeled throughout and is not a real FHIR review. Tests do not repeat
+or independently verify the sample's substantive findings.
 
 Issues and pull requests are welcome; the repository owner controls merges
 and releases. See [CONTRIBUTING.md](CONTRIBUTING.md). MIT licensed.

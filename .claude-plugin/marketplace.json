@@ -1,7 +1,7 @@
 {
   "name": "fhir-chimney-sweep",
   "owner": {"name": "JD"},
-  "metadata": {"description": "Evidence-backed FHIR resource continuity reviews.", "version": "0.1.0"},
+  "metadata": {"description": "Evidence-backed FHIR resource continuity reviews.", "version": "0.1.1"},
   "plugins": [{
     "name": "fhir-chimney-sweep",
     "source": "./plugins/fhir-chimney-sweep",

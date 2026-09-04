@@ -70,7 +70,10 @@ edit when supportable, rationale, validation check, dependencies, and any human
 decision needed. Readability suggestions are welcome; preserve technical meaning
 and SHALL/SHOULD/MAY strength. Prefer local edits over wholesale rewrites.
 
-Classify separately:
+Record both a finding type and a change classification. They answer different
+questions and must not be inferred from one another.
+
+Finding type and priority:
 
 - **Correction:** demonstrated inconsistency, invalid representation, or broken
   publication behavior. P1 = material semantic/conformance or usability blocker;
@@ -82,6 +85,26 @@ Classify separately:
 - **Missing example:** a proposed new scenario with purpose, minimum valid
   content, relationships, and acceptance check. It is not a conformance defect
   solely because it is absent. Use P2 or P3.
+
+Change classification:
+
+- **Must fix (implementation or testing impact):** existing content materially
+  impairs implementation or test design, for example by teaching an invalid
+  structure, conformance rule, reference, operation, resource boundary, or
+  workflow. Resolve it before publication.
+- **Minor fix:** existing content has a correctness or readability problem that
+  does not materially obstruct implementation or testing. This includes
+  implausible or internally inconsistent clinical example data, chronology,
+  terminology displays, captions, links, and typographical errors unless the
+  same finding also contains an implementation/test blocker.
+- **Net new addition:** proposed explanatory material, diagram work,
+  publication coverage, or example content. Every Missing example uses this
+  classification. Its absence alone is not an existing-content defect.
+
+Organize the detailed finding list first by change classification in the order
+above, then by area (Documentation, Examples, Module, Cross-layer, Suggested
+missing examples), then by the numeric portion of the finding ID within that
+area. Keep empty classification/area groups out of the report.
 
 Do not invent codes, clinical values, ranges, patients, historical decisions,
 element names, or replacement relationships. Where evidence does not establish
