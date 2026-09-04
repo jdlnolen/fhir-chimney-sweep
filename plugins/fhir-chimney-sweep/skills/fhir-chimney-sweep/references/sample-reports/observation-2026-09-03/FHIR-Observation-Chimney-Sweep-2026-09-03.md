@@ -6,6 +6,8 @@ Recommendation: Changes required
 
 Reviewed: 2026-09-03
 
+Classification revision: 2026-09-04
+
 FHIR version: 6.0.0-ballot4 \(current official R6 CI snapshot\)
 
 Package: hl7.fhir.r6.core\#6.0.0-ballot4
@@ -14,11 +16,23 @@ Source revision: 09dfb700767aa757dd405d56c62bf41c5007e0f0
 
 [Build](<https://build.fhir.org/observation.html>)
 
-Report content ID: c87d13fc58ef7836 \(identical in Markdown and Word\)
+Report content ID: c8b1e82d9f3e15be \(identical in Markdown and Word\)
 
-The current Observation build needs coordinated corrections across documentation, examples and modules. Highest-priority issues include unsupported genomic and operation paths, organizer/absence contradictions, inconsistent calculations and coded results, and a medication/device boundary error. Questions and missing-example proposals are separate from demonstrated defects. No publication sign-off is implied.
+The current Observation build needs coordinated corrections across documentation, examples and modules. Highest-priority issues include unsupported genomic and operation paths, organizer/absence contradictions, inconsistent calculations and coded results, and a medication/device boundary error. Questions and missing-example proposals are separate from demonstrated defects. No publication sign-off is implied. This revision classifies every proposed item as a must fix with implementation or testing impact, a minor fix, or a net new addition.
 
 Triage: P1: 13; P2: 36; P3: 5. Correction: 34; Suggestion: 3; Question: 11; Missing example: 6.
+
+## Change classification
+
+| Class | Meaning | Count | Publication action |
+| --- | --- | --- | --- |
+| Must fix \(implementation or testing impact\) | Existing content conflicts with structure, conformance rules, reference or operation semantics, resource boundaries, or implementation/test guidance. | 27 | Resolve before publication so implementers and test authors can rely on the specification. |
+| Minor fix | Existing content has a clinical-plausibility, dataset, chronology, wording, terminology, link, or caption issue without material implementation/test impact. | 17 | Correct as publication cleanup; do not treat it as mission critical. |
+| Net new addition | New explanatory material, diagram work, publication coverage, or example content. | 10 | Add if accepted; absence alone is not an existing-content defect. |
+
+Change classification is separate from finding type and P1/P2/P3 priority. Must fix is reserved for content that materially impairs implementation or test design; clinical plausibility and internally inconsistent example data are minor fixes unless the same finding also contains a structural, conformance, reference, operation, or workflow blocker.
+
+Detailed findings are organized first by change classification, then by area, then by numeric finding ID within that area.
 
 ## Scope and review boundary
 
@@ -292,33 +306,13 @@ Module / Incidental module mentions: Clinical Summary, Clinical Reasoning and Se
 
 Cross-layer / Pinned source/rendered correspondence: version.info identifies buildId v5.0.0-7582-g09dfb70076; inspected source was pinned to the matching full commit, not the newer working checkout. Sources: BUILD, PSRC, NOTESRC, LISTSRC.
 
-## Documentation findings
+## Must fix \(implementation or testing impact\)
 
-### D12 \| P1 \| Correction: Update obsolete paths in operation guidance
+### Documentation findings
 
-Location: Observation $lastn grouping rule; $stats code parameter and overview
+#### D01 \| P2 \| Correction: Describe category as a preferred binding
 
-Evidence: $lastn compares coding.value, which is not a Coding element. $stats traverses .related with type=has-member, a removed Observation representation, rather than hasMember. Its overview also uses stale patient/duration-only wording.
-
-Evidence sources: LASTN, STATS, STATOP, LASTNOP, DEF, DATATYPES
-
-Proposed change: Use current paths and align the operation descriptions with formal parameters.
-
-Replacement / minimum content:
-
-```
-$lastn: compare Coding.code and Coding.system. $stats: traverse Observation.hasMember references and Observation.component according to the documented panel behavior. Describe subject and duration or period consistently. Clarify component-value inclusion instead of implying only top-level valueQuantity is evaluated.
-```
-
-Rationale: These are executable algorithm instructions, not merely historical terms.
-
-Acceptance check: Compare every path with R6 definitions and test top-level values, component BP and an organizer panel.
-
-Human decision: Editorial approval; no new design decision required.
-
-Depends on: None
-
-### D01 \| P2 \| Correction: Describe category as a preferred binding
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation.category comment
 
@@ -342,7 +336,9 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### D02 \| P2 \| Question: Reconcile subject, focus and patient-device rules
+#### D02 \| P2 \| Question: Reconcile subject, focus and patient-device rules
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation.subject definition/comment, focus comment, Notes on subject; Device use case A
 
@@ -366,7 +362,9 @@ Human decision: OO and Devices must decide the intended normative patient-associ
 
 Depends on: None
 
-### D03 \| P2 \| Correction: Use actual Observation status codes in statusReason guidance
+#### D03 \| P2 \| Correction: Use actual Observation status codes in statusReason guidance
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation.statusReason.comment
 
@@ -390,7 +388,9 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### D04 \| P2 \| Question: Clarify cancellation versus an unobtainable result
+#### D04 \| P2 \| Question: Clarify cancellation versus an unobtainable result
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Notes 10.1.5.11; Observation Status definitions
 
@@ -414,7 +414,9 @@ Human decision: OO must decide the intended status transition and when existing 
 
 Depends on: None
 
-### D05 \| P2 \| Correction: Remove undefined ObservationDefinition inheritance wording
+#### D05 \| P2 \| Correction: Remove undefined ObservationDefinition inheritance wording
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Boundaries and Relationships: ObservationDefinition paragraph and linked section
 
@@ -438,31 +440,9 @@ Human decision: OO should confirm whether a separately defined extension or prof
 
 Depends on: None
 
-### D07 \| P2 \| Suggestion: Explain the new contextual and device roles together
+#### D08 \| P2 \| Question: Resolve normalValue-only reference ranges
 
-Location: Notes 10.1.5.7 and device/anatomy guidance
-
-Evidence: The structure contains context, supportingDevice and bodyStructure, but the usage discussion does not adequately contrast these roles with existing relationships.
-
-Evidence sources: DOC, DEF
-
-Proposed change: Add a short role comparison and link a worked R6 example.
-
-Replacement / minimum content:
-
-```
-Contrast basedOn (request), partOf (containing event), derivedFrom (source evidence), triggeredBy (trigger), context (interpretive context), device (measurement device), supportingDevice (supporting equipment), and bodyStructure (coded or referenced anatomy). Show the actual R6 cardinalities and CodeableReference shape.
-```
-
-Rationale: Reduces the need to infer modeling intent from element names alone.
-
-Acceptance check: Check every role and example path against snapshot.element; do not imply that all roles must be populated.
-
-Human decision: Editorial approval; no new design decision required.
-
-Depends on: None
-
-### D08 \| P2 \| Question: Resolve normalValue-only reference ranges
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation.referenceRange.normalValue and invariant obs-3
 
@@ -486,31 +466,9 @@ Human decision: OO must decide whether normalValue alone is a sufficient referen
 
 Depends on: None
 
-### D09 \| P2 \| Question: Align the SNOMED concept-domain mapping with allowed coding patterns
+#### D10 \| P2 \| Correction: Synchronize Vital Signs profile descriptions and constraint IDs
 
-Location: Observation mappings: Observation.code; Notes on SNOMED CT patterns 3 and 4
-
-Evidence: The concept-domain mapping names observable entities/evaluation procedures, while the notes and abdominal-tenderness example also use clinical findings.
-
-Evidence sources: MAP, DOC, EX51
-
-Proposed change: Clarify whether the mapping is illustrative or intended to exclude other documented patterns.
-
-Replacement / minimum content:
-
-```
-Either label the mapping non-exhaustive and link the coding-pattern guidance, or revise the documented domain after terminology-owner review. Do not invalidate the clinical-finding pattern by inference.
-```
-
-Rationale: Mappings should not appear to contradict sanctioned examples.
-
-Acceptance check: Review each documented SNOMED pattern against the final mapping and example code systems.
-
-Human decision: Terminology and OO owners must confirm the mapping scope and any extension to its expression.
-
-Depends on: None
-
-### D10 \| P2 \| Correction: Synchronize Vital Signs profile descriptions and constraint IDs
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: bp.profile.json root definition; vitalspanel.profile.json root definition; bodyheight.profile.json condition links
 
@@ -534,7 +492,9 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### D11 \| P2 \| Question: Distinguish temporal aggregation from calculated BMI
+#### D11 \| P2 \| Question: Distinguish temporal aggregation from calculated BMI
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Vital Signs Formal View introductory paragraphs
 
@@ -558,33 +518,37 @@ Human decision: Vital Signs owners must confirm the intended temporal-aggregatio
 
 Depends on: None
 
-### D06 \| P3 \| Correction: Repair local wording and duplicated definitions
+#### D12 \| P1 \| Correction: Update obsolete paths in operation guidance
 
-Location: Notes on subject, components, coded results, NaN and reference ranges; component.value\[x\].comment; Scope temperature link
+Change classification: Must fix \(implementation or testing impact\)
 
-Evidence: The prose says two attributes then names three; says one performer despite performer 0..\*; implies a base binding on valueCodeableConcept; names only valueCodeableConcept for NaN; and duplicates value-choice comments. The introductory temperature link leads to entered-in-error f202.
+Location: Observation $lastn grouping rule; $stats code parameter and overview
 
-Evidence sources: DOC, DEF, EX04, EX23
+Evidence: $lastn compares coding.value, which is not a Coding element. $stats traverses .related with type=has-member, a removed Observation representation, rather than hasMember. Its overview also uses stale patient/duration-only wording.
 
-Proposed change: Apply bounded copy edits without changing conformance strength.
+Evidence sources: LASTN, STATS, STATOP, LASTNOP, DEF, DATATYPES
+
+Proposed change: Use current paths and align the operation descriptions with formal parameters.
 
 Replacement / minimum content:
 
 ```
-Use "several elements" for specimen/bodyStructure/focus; "shared Observation-level context, including the same performer list" for components; "a profile or use case may specify an answer value set" for coded results; "value[x] is absent" for NaN; and "type, appliesTo and age" for distinguishing reference ranges. Remove the duplicate value-type bullets. Link the ordinary temperature illustration to observation-example-body-temperature.html.
+$lastn: compare Coding.code and Coding.system. $stats: traverse Observation.hasMember references and Observation.component according to the documented panel behavior. Describe subject and duration or period consistently. Clarify component-value inclusion instead of implying only top-level valueQuantity is evaluated.
 ```
 
-Rationale: Makes the prose precise without requiring optional data or invalidating error-history examples.
+Rationale: These are executable algorithm instructions, not merely historical terms.
 
-Acceptance check: Regenerate the notes and definitions; verify the linked ordinary temperature and retained entered-in-error example.
+Acceptance check: Compare every path with R6 definitions and test top-level values, component BP and an organizer panel.
 
 Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-## Examples findings
+### Examples findings
 
-### E01 \| P1 \| Correction: Repair the derived BMI graph, not just its broken link
+#### E01 \| P1 \| Correction: Repair the derived BMI graph, not just its broken link
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation/bmi-using-related: derivedFrom, effectiveDateTime and valueQuantity
 
@@ -608,175 +572,9 @@ Human decision: Owner must choose the intended inputs and measurement event; no 
 
 Depends on: None
 
-### E02 \| P1 \| Correction: Give timed Apgar scores distinct, birth-relative timestamps
+#### E06 \| P2 \| Correction: Complete the infant and spirometry reference graphs
 
-Location: The 1-, 2-, 5-, 10- and 20-minute Apgar examples: effectiveDateTime and contained Patient birthTime
-
-Evidence: All five observations share 2016-05-18T22:33:22Z. Each contained newborn has birthTime 2016-05-18T10:28:45Z, inconsistent with all five minute-specific codes.
-
-Evidence sources: EX31, EX32, EX33, EX34, EX35
-
-Proposed change: Synchronize observation times, newborn identity and narratives across the family.
-
-Replacement / minimum content:
-
-```
-If retaining the recorded birth time, use 10:29:45Z, 10:30:45Z, 10:33:45Z, 10:38:45Z and 10:48:45Z on 2016-05-18 for the respective scores. Otherwise approve a different birth time and derive all five times from it.
-```
-
-Rationale: The minute after birth is part of what these coded observations mean.
-
-Acceptance check: Calculate elapsed minutes from each contained birthTime and compare the code/display and narrative.
-
-Human decision: Owner must confirm whether the birth time or observation timeline is the intended fixture.
-
-Depends on: None
-
-### E03 \| P1 \| Correction: Reconcile the 2-minute Apgar reflex answer and score
-
-Location: Observation/2minute-apgar-score: reflex-irritability component
-
-Evidence: LA6721-0 and its displayed response describe the same response scored 2 in the later examples, but this example assigns weight/local score 1 and text describing a lesser response. Its total of 5 follows the local weights.
-
-Evidence sources: EX32, EX33, EX34, EX35
-
-Proposed change: Make response code, display, free text, item weight and total mutually consistent.
-
-Replacement / minimum content:
-
-```
-If the intended response is the one-point reflex response, select its verified answer code and matching display. If LA6721-0 is intended, correct the score/weight and recompute the total. Regenerate the narrative in either case.
-```
-
-Rationale: A scoring example must not teach a contradictory code-to-score mapping.
-
-Acceptance check: Validate the chosen LOINC answer against its answer list, sum the component weights and compare the total.
-
-Human decision: A scoring/terminology reviewer must select the intended response; an unverified substitute code is not supplied.
-
-Depends on: None
-
-### E04 \| P1 \| Correction: Correct the bone-density UCUM denominator
-
-Location: Observation/bmd: valueQuantity.code
-
-Evidence: The displayed unit is g/cm², but the UCUM code is g/cm-2. The negative exponent in the denominator changes the dimension. LOINC 24701-5 gives g/cm2 as an example UCUM unit.
-
-Evidence sources: EX38, UCUM, LOINCBMD
-
-Proposed change: Correct the machine-readable unit after confirming the stated areal-density intent.
-
-Replacement / minimum content:
-
-```
-Set valueQuantity.code to g/cm2; retain system http://unitsofmeasure.org and the g/cm² display. Preserve 0.887 only after confirming it is an areal-density value.
-```
-
-Rationale: The current code and display describe different dimensions.
-
-Acceptance check: Parse the UCUM code and verify mass per area; compare all published formats.
-
-Human decision: Confirm the existing numeric value and intended dimension; this report does not clinically interpret the result.
-
-Depends on: None
-
-### E05 \| P1 \| Correction: Remove the future last-menstrual-period date
-
-Location: Observation/date-lastmp: effectiveDateTime and valueDateTime
-
-Evidence: The observation is effective 2016-01-24, but its last-menstrual-period value is 2016-12-30.
-
-Evidence sources: EX22
-
-Proposed change: Choose dates that fit the explicitly retrospective observation.
-
-Replacement / minimum content:
-
-```
-Use an owner-approved last-menstrual-period date on or before the assessment time, or move the assessment date to the intended later encounter. Update narrative and all serializations together.
-```
-
-Rationale: The current result is future information presented as a last event.
-
-Acceptance check: Assert valueDateTime &lt;= effectiveDateTime for this scenario.
-
-Human decision: Owner must choose the intended dates; no historical date is guessed.
-
-Depends on: None
-
-### E14 \| P1 \| Correction: Use a gender-identity answer that matches the question
-
-Location: Observation/clinical-gender: code and valueCodeableConcept
-
-Evidence: LOINC 76691-5 asks about gender identity, but the answer uses SNOMED CT 191788006 with display Feminism in boy \(finding\), a different kind of assertion.
-
-Evidence sources: EX36, PATIENT
-
-Proposed change: Replace the mismatched answer and modernize the scenario wording.
-
-Replacement / minimum content:
-
-```
-Use an owner-approved synthetic self-reported gender-identity response with a verified answer concept and matching display/text. Do not infer gender identity from Patient.gender or reuse a behavioral finding as the answer.
-```
-
-Rationale: The current example misrepresents the question-answer semantics and can mislead implementers.
-
-Acceptance check: Verify the answer list/code and distinguish self-reported identity from administrative gender.
-
-Human decision: Terminology and clinical owners must select the intended synthetic response.
-
-Depends on: None
-
-### E20 \| P1 \| Correction: Rebuild the linked lipid report as one consistent dataset
-
-Location: Diagnostics-linked DiagnosticReport/lipid-panel-example and its four contained Observations
-
-Evidence: Patient/pat2 is Donald Duck, but the report/narrative names Wile E. Coyote. Narrative and structured dates differ. The report names a direct-LDL panel, while the LDL component is calculated; narrative LDL is 4.2 versus structured 4.6. HDL/LDL mass-concentration codes use mmol/L.
-
-Evidence sources: LIPIDREPORT, DIAG, DEP06
-
-Proposed change: Choose an internally coherent synthetic report, then regenerate the complete narrative.
-
-Replacement / minimum content:
-
-```
-Align patient identity, effective/issued dates, panel method, LDL value and component code-property-unit pairs. Resolve whether substance-concentration codes or converted mass values are intended. Preserve strict reference-limit meaning using the supported comparator where appropriate; do not let a narrative < or > become an inclusive structured limit.
-```
-
-Rationale: This linked teaching report has multiple mutually reinforcing identity and result inconsistencies.
-
-Acceptance check: Recalculate any derived LDL after the method decision; verify all four contained results, reference limits and every narrative cell.
-
-Human decision: Clinical and terminology owners must approve the intended dataset. Do not conflate this report with the six separate 2015 lipid examples.
-
-Depends on: None
-
-### E24 \| P1 \| Correction: Fix statistics example terminology and request parameters
-
-Location: Observation $stats request and two inline XML Observation results
-
-Evidence: The request and response use min/max, but the required CodeSystem defines minimum/maximum. Response Coding.system is a valueset URL rather than the canonical statistic code system.
-
-Evidence sources: STATS, STATDEF, STATOP
-
-Proposed change: Correct both sides of the worked operation exchange.
-
-Replacement / minimum content:
-
-```
-Use statistic=minimum and statistic=maximum in the request. In each result component set Coding.system to http://hl7.org/fhir/observation-statistics; use average, maximum, minimum and count as appropriate. Keep UCUM units aligned with the statistic and preserve the two-result Parameters envelope.
-```
-
-Rationale: The worked exchange otherwise teaches invalid code-system/code pairs.
-
-Acceptance check: Validate the request parameters against the bound value set and both response Observations against the chosen aggregate-result representation.
-
-Human decision: OO should confirm aggregate-result profile guidance in D11; the code spelling/system corrections are directly supported.
-
-Depends on: D11, D12
-
-### E06 \| P2 \| Correction: Complete the infant and spirometry reference graphs
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Vomiting, smoke exposure, tracheostomy care, blood-group examples and spirometry
 
@@ -800,7 +598,9 @@ Human decision: Owner must approve fixture identities and who performed spiromet
 
 Depends on: None
 
-### E07 \| P2 \| Correction: Finish and correctly present the IV-pump Bundle
+#### E07 \| P2 \| Correction: Finish and correctly present the IV-pump Bundle
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: observation-example-devicemetricfocus: Bundle entries and generated page
 
@@ -824,151 +624,9 @@ Human decision: Resolve the patient/device subject decision in D02 before finali
 
 Depends on: D02
 
-### E08 \| P2 \| Question: Decide whether the IV-pump example measures volume or flow
+#### E15 \| P2 \| Correction: Type the oyster specimen group as specimens
 
-Location: Bundled Observation code, valueQuantity and focused DeviceMetric.type
-
-Evidence: The Observation code describes intravascular fluid intake over eight hours, its unit is mL/\(8.h\), and the metric describes pump flow. These may mix interval volume and flow-rate semantics.
-
-Evidence sources: EX10, DM
-
-Proposed change: Select one measurand and align code, metric, unit and effective period.
-
-Replacement / minimum content:
-
-```
-For accumulated eight-hour intake, use a compatible volume result and interval. For instantaneous or interval-normalized flow, use a verified flow-rate code and unit. Do not simply relabel the unit without resolving the intended quantity.
-```
-
-Rationale: Dimensional and temporal meaning matter more than whether the syntax parses.
-
-Acceptance check: Have device/terminology reviewers verify the chosen code-property-unit combination.
-
-Human decision: Devices and OO must decide the intended measurand.
-
-Depends on: D02
-
-### E09 \| P2 \| Correction: Remove result interpretation from an unperformed blood pressure
-
-Location: Observation/blood-pressure-cancel: interpretation and component.dataAbsentReason
-
-Evidence: There are no numeric results, but interpretation is Low. The note says the order was cancelled; component absence reasons say not-asked.
-
-Evidence sources: EX15, DOC, STATUS
-
-Proposed change: Remove unsupported interpretation and align the absence explanation with the scenario.
-
-Replacement / minimum content:
-
-```
-Delete the Low interpretation. If the measurements were not performed because the order was cancelled, use the appropriate verified not-performed absence concept and explain cancellation with statusReason or note. Do not add invented measurements.
-```
-
-Rationale: An unperformed test does not establish low blood pressure.
-
-Acceptance check: Confirm both components remain present as required by the BP profile and carry consistent absence reasons.
-
-Human decision: Owner must confirm whether not-asked was intentional or an inherited placeholder.
-
-Depends on: D04
-
-### E10 \| P2 \| Correction: Match eGFR reference-range population to the result code
-
-Location: Observation/f205: first component.code and component.referenceRange.appliesTo
-
-Evidence: The first component uses the Black-population MDRD concept 48643-1, but its reference-range population text says non-black. The second component uses non-Black concept 48642-3; the top-level code is the general MDRD concept 33914-3.
-
-Evidence sources: EX26, LOINCEGFR
-
-Proposed change: Align population labels and range applicability without silently changing the historical equation.
-
-Replacement / minimum content:
-
-```
-Confirm which population the first component represents and correct its code/display, referenceRange.appliesTo and narrative together. Keep the existing paired historical-method example only with explicit method/context; a modern equation would be a separate approved example.
-```
-
-Rationale: The result and its range currently describe different populations.
-
-Acceptance check: Check both result concepts, population labels and method wording against verified terminology.
-
-Human decision: Owner must choose the intended population and whether to retain this historical teaching case.
-
-Depends on: None
-
-### E11 \| P2 \| Correction: Reconcile the sitting-MAP caption, category and dates
-
-Location: Observation/map-sitting and its example-index caption
-
-Evidence: The mean blood-pressure example uses laboratory category, is advertised as demonstrating body-position/delta extensions that are absent, and is final with issued time preceding the end of its effective period.
-
-Evidence sources: EX50, INDEX, VITAL
-
-Proposed change: Choose whether this is a point measurement or a derived temporal result and align all representations.
-
-Replacement / minimum content:
-
-```
-For a point-in-time MAP, use vital-signs categorization and coherent effective/issued times, and remove the unsupported extension claim. If a delta/temporal statistic is intended, supply its actual inputs, derivation and approved representation rather than keeping a misleading caption.
-```
-
-Rationale: The label, lifecycle and data should describe the same example.
-
-Acceptance check: Check chronology, claimed profile applicability and every advertised feature in the payload.
-
-Human decision: Owner must decide the intended MAP scenario; do not automatically apply a point-in-time profile to an aggregate.
-
-Depends on: D11
-
-### E12 \| P2 \| Question: Review unusual clinical fixture values and ranges
-
-Location: Body-length example; f002 base excess; f005 hemoglobin
-
-Evidence: A 25 cm body length is attached to a patient who is an adult at the observation date. Base excess uses a 7.1-11.2 mmol/L range. Hemoglobin is already 7.2 g/dL, but its 7.5-10 g/dL reference interval needs provenance for this patient.
-
-Evidence sources: EX06, EX18, EX21, DEP04
-
-Proposed change: Have a clinical example owner verify the intended populations, units and reference intervals.
-
-Replacement / minimum content:
-
-```
-Use an appropriate synthetic subject/value pair for body length. For the two laboratory intervals, supply the intended method/population provenance or replace the fixtures with owner-approved internally consistent values. Do not replace them with a universal textbook interval.
-```
-
-Rationale: Unusual does not itself prove invalid; these require informed human review.
-
-Acceptance check: Record clinical approval and recheck demographics, units, flags and ranges together.
-
-Human decision: Clinical reviewers must decide the intended scenarios and intervals. There is no mmol/L-versus-g/dL serialization defect in f005.
-
-Depends on: None
-
-### E13 \| P2 \| Correction: Make the vital-sign panel represent a coherent time
-
-Location: Observation/vitals-panel: effectiveDateTime and hasMember
-
-Evidence: The panel is dated 1999 and groups three 1999 vital signs with a blood-pressure observation from 2012.
-
-Evidence sources: EX14, EX02, EX03, EX04, EX11, VP
-
-Proposed change: Group observations from the intended encounter/time or clearly select another use case.
-
-Replacement / minimum content:
-
-```
-Use a compatible-time blood-pressure member for the 1999 point-in-time panel, or update the complete member set and panel time to a coherent encounter. Preserve organizer=true and at least two hasMember entries.
-```
-
-Rationale: A point-in-time teaching panel should not silently span thirteen years.
-
-Acceptance check: Resolve every member; compare subject and effective times with the panel profile.
-
-Human decision: Owner must select the intended measurement event.
-
-Depends on: None
-
-### E15 \| P2 \| Correction: Type the oyster specimen group as specimens
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation/vp-oyster: contained Group/group1.type
 
@@ -992,7 +650,9 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### E16 \| P2 \| Correction: Remove the fictitious Korean profile assertion and complete its UCUM code
+#### E16 \| P2 \| Correction: Remove the fictitious Korean profile assertion and complete its UCUM code
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: krcore-observation-labresult-example-01: meta.profile and valueQuantity
 
@@ -1016,103 +676,9 @@ Human decision: The profile owner must approve any replacement canonical and pac
 
 Depends on: None
 
-### E17 \| P2 \| Question: Explain incomplete blood-group panel membership
+#### E22 \| P2 \| Correction: Repair stale catalog terms and stored narrative links
 
-Location: Observation/bgpanel: code and hasMember
-
-Evidence: The code describes blood type and indirect antibody screening, but members demonstrate only ABO and Rh status.
-
-Evidence sources: EX46, EX47, EX48
-
-Proposed change: Make explicit whether this is a partial panel or a complete panel demonstration.
-
-Replacement / minimum content:
-
-```
-Either label the example as a deliberately partial result set and explain missing/pending antibody-screen results, add a coherent antibody-screen member, or use a verified narrower panel code. If it is a pure grouper, demonstrate organizer=true consistently with X02.
-```
-
-Rationale: A partial result set can be valid; unexplained incompleteness is a teaching problem, not an automatic cardinality error.
-
-Acceptance check: Compare the approved panel meaning with every member and its lifecycle state.
-
-Human decision: Owner must choose complete versus intentionally partial panel semantics.
-
-Depends on: X02, E06
-
-### E18 \| P2 \| Correction: Resolve the publication status of seven source-only examples
-
-Location: Pinned Observation source files not registered in the example catalog
-
-Evidence: Six alternate Apgar examples and body-height-merged are present in source but absent from the published index. The Apgar graph includes unresolved infant/component targets; body-height-merged is referenced by source Provenance examples. The alternate panel links to the adult 1999 heart-rate example. Its total-score file uses code 32411-1, also used for reflex irritability, and contains no result.
-
-Evidence sources: SO1, SO2, SO3, SO4, SO5, SO6, SO7, LISTSRC, PROVMERGE, PROVVERIFY, EX03
-
-Proposed change: Choose which files are intended for publication, then repair their graph and registration together.
-
-Replacement / minimum content:
-
-```
-For the six Apgar files, register and publish a complete, coherent family or explicitly retire obsolete teaching variants with reference cleanup. For body-height-merged, preserve its merge/Provenance scenario and ensure it and its merge-survivor patient are available wherever linked. Do not delete a referenced file solely because it is absent from the index. Before publishing apgar-panel, supply an actual same-newborn Apgar heart-rate member. Correct apgar-score to a verified total-score concept and result, and reconcile its contained newborn with the panel subject and birth-relative time.
-```
-
-Rationale: Source-only content must not be mistaken for a successfully published example.
-
-Acceptance check: Search source references before changing registration; build and follow every retained public target.
-
-Human decision: Owners must decide the intended publication status. These are source-only findings, not seven additional published-page defects.
-
-Depends on: E02, E06
-
-### E19 \| P2 \| Question: Resolve the herd assay scale and sampling date
-
-Location: Observation/herd1: valueQuantity, referenceRange.text and effectiveDateTime; pooled-serum specimen
-
-Evidence: The value uses percent while the sample/positive-control thresholds are written as fractions. The specimen collection date is 2017-11-14, but observation effectiveDateTime is 2017-11-20. A leading greater-than sign in Markdown also renders the positive threshold as a blockquote.
-
-Evidence sources: EX42, DOC, DEP16
-
-Proposed change: Confirm the assay convention and relevant time; rewrite the range prose without Markdown ambiguity.
-
-Replacement / minimum content:
-
-```
-State whether 0.2 means 0.2 percent or a ratio of 0.2, then align the unit and all thresholds. Use the specimen-collection time for physiologic relevance unless another meaning is explicitly justified. Write "Positive when the ratio is greater than ..." to preserve the comparison in the rendered narrative.
-```
-
-Rationale: A percentage/fraction mismatch can change interpretation by a factor of 100.
-
-Acceptance check: Check assay documentation, specimen timing and the rendered inequality text.
-
-Human decision: Assay owner must establish the actual scale and relevant date; no cutoff or numeric conversion is assumed.
-
-Depends on: None
-
-### E21 \| P2 \| Correction: Make the CBC order and report match their listed results
-
-Location: diagnosticreport-example-f001-bloodexam Bundle: ServiceRequest/DiagnosticReport code and result list
-
-Evidence: The request and report use CBC code 58410-2, but results include glucose, base excess and carbon-dioxide partial pressure alongside erythrocytes and hemoglobin.
-
-Evidence sources: CBCREPORT, EX16, EX18, EX19, EX20, EX21
-
-Proposed change: Align order, report code and result membership.
-
-Replacement / minimum content:
-
-```
-Either demonstrate a genuine CBC with owner-approved CBC members, or use an appropriate verified code and caption for the mixed examination. Do not delete the valid standalone chemistry examples simply to repair this report.
-```
-
-Rationale: The order/report semantics should describe the measurements actually linked.
-
-Acceptance check: Resolve each result and compare its test concept with the chosen report and order.
-
-Human decision: The clinical example owner must choose the intended report type.
-
-Depends on: None
-
-### E22 \| P2 \| Correction: Repair stale catalog terms and stored narrative links
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: GCS-from-questionnaire and spirometry captions; cholesterol/non-HDL/triglyceride/VLDL narratives
 
@@ -1136,7 +702,35 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### E25 \| P2 \| Correction: Make abbreviated lastn responses internally consistent
+#### E24 \| P1 \| Correction: Fix statistics example terminology and request parameters
+
+Change classification: Must fix \(implementation or testing impact\)
+
+Location: Observation $stats request and two inline XML Observation results
+
+Evidence: The request and response use min/max, but the required CodeSystem defines minimum/maximum. Response Coding.system is a valueset URL rather than the canonical statistic code system.
+
+Evidence sources: STATS, STATDEF, STATOP
+
+Proposed change: Correct both sides of the worked operation exchange.
+
+Replacement / minimum content:
+
+```
+Use statistic=minimum and statistic=maximum in the request. In each result component set Coding.system to http://hl7.org/fhir/observation-statistics; use average, maximum, minimum and count as appropriate. Keep UCUM units aligned with the statistic and preserve the two-result Parameters envelope.
+```
+
+Rationale: The worked exchange otherwise teaches invalid code-system/code pairs.
+
+Acceptance check: Validate the request parameters against the bound value set and both response Observations against the chosen aggregate-result representation.
+
+Human decision: OO should confirm aggregate-result profile guidance in D11; the code spelling/system corrections are directly supported.
+
+Depends on: D11, D12
+
+#### E25 \| P2 \| Correction: Make abbreviated lastn responses internally consistent
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Observation $lastn: three response illustrations
 
@@ -1160,33 +754,11 @@ Human decision: Owner chooses whether to add full response files; do not treat t
 
 Depends on: None
 
-### E23 \| P3 \| Suggestion: Add selective teaching context without inflating every minimal example
+### Module findings
 
-Location: Laboratory f203/f204/f206, sampled-data ECG, non-HDL and existing minimal examples
+#### M01 \| P1 \| Correction: Correct the additional-testing relationship arrows
 
-Evidence: Some teaching cases omit collection/result context; ECG leads share identical samples without explaining the synthetic waveform or amplitude scaling. Non-HDL has an unconditional treatment-goal statement. The base resource permits many omitted fields.
-
-Evidence sources: EX24, EX25, EX27, EX28, EX57, DEF
-
-Proposed change: Improve representative examples and explain deliberate simplifications.
-
-Replacement / minimum content:
-
-```
-Add meaningful time/specimen context to selected laboratory cases; prefer interoperable UCUM coding where appropriate without declaring all alternate units invalid. Explain the synthetic ECG signal and amplitude conversion/units. Qualify the non-HDL goal as an illustrative, population-dependent statement or remove it. Retain focused eye-color, decimal-precision and multilingual examples.
-```
-
-Rationale: Examples should teach their intended concept without unsupported clinical generalizations or mandatory boilerplate.
-
-Acceptance check: Verify any added data clinically and structurally; confirm that no optional base element has been recast as required.
-
-Human decision: Owners decide which examples need fuller context; no new patient data or clinical reference values are supplied.
-
-Depends on: None
-
-## Module findings
-
-### M01 \| P1 \| Correction: Correct the additional-testing relationship arrows
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Diagnostics parent-child-structure-3.png
 
@@ -1210,31 +782,9 @@ Human decision: OO must choose reason versus supporting information and confirm 
 
 Depends on: None
 
-### M05 \| P1 \| Correction: Separate drug administration from device-state observations
+#### M02 \| P2 \| Correction: Do not use entered-in-error merely to mark suspect data
 
-Location: Device module use case F2: bolus narrative, command mapping and outcome artifacts
-
-Evidence: The scenario records an administered drug bolus as an Observation and generically uses ServiceRequest for the medication action. Observation boundaries exclude uses with a dedicated resource; MedicationAdministration represents actual administration.
-
-Evidence sources: DEVICE, DOC, MEDADMIN, DEF
-
-Proposed change: Distinguish technical configuration/command records from medication ordering and administration.
-
-Replacement / minimum content:
-
-```
-Keep configuration measurements or confirmed device state in Observation. Represent the actual bolus in MedicationAdministration and the medication authorization with the appropriate medication-request workflow. If needed, link a relevant Observation through supported partOf/basedOn relationships. State that the device command operates under valid medication authorization; do not imply authorization from the monitoring observation.
-```
-
-Rationale: Avoids teaching a medication event as a generic measurement and collapsing distinct workflow roles.
-
-Acceptance check: Review the complete command/order/administration/measurement graph with Pharmacy and Devices owners.
-
-Human decision: Joint owners must confirm the medication and device command workflow; no dose, drug choice or clinical action is recommended.
-
-Depends on: None
-
-### M02 \| P2 \| Correction: Do not use entered-in-error merely to mark suspect data
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Device module use case A: Implementation Guidance
 
@@ -1258,7 +808,9 @@ Human decision: Owners should agree the interoperable quality-concern representa
 
 Depends on: None
 
-### M03 \| P2 \| Correction: Retrieve settings already active at the start of a time window
+#### M03 \| P2 \| Correction: Retrieve settings already active at the start of a time window
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Device module use case B: settings-window query
 
@@ -1282,7 +834,9 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### M04 \| P2 \| Correction: Remove nonexistent DeviceAlert components from threshold guidance
+#### M04 \| P2 \| Correction: Remove nonexistent DeviceAlert components from threshold guidance
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Device module use case C: Implementation Guidance and Data Requirements
 
@@ -1306,7 +860,35 @@ Human decision: Devices owners must approve any extension-based alternative.
 
 Depends on: None
 
-### M06 \| P2 \| Question: Make monitoring traceability requirements consistent
+#### M05 \| P1 \| Correction: Separate drug administration from device-state observations
+
+Change classification: Must fix \(implementation or testing impact\)
+
+Location: Device module use case F2: bolus narrative, command mapping and outcome artifacts
+
+Evidence: The scenario records an administered drug bolus as an Observation and generically uses ServiceRequest for the medication action. Observation boundaries exclude uses with a dedicated resource; MedicationAdministration represents actual administration.
+
+Evidence sources: DEVICE, DOC, MEDADMIN, DEF
+
+Proposed change: Distinguish technical configuration/command records from medication ordering and administration.
+
+Replacement / minimum content:
+
+```
+Keep configuration measurements or confirmed device state in Observation. Represent the actual bolus in MedicationAdministration and the medication authorization with the appropriate medication-request workflow. If needed, link a relevant Observation through supported partOf/basedOn relationships. State that the device command operates under valid medication authorization; do not imply authorization from the monitoring observation.
+```
+
+Rationale: Avoids teaching a medication event as a generic measurement and collapsing distinct workflow roles.
+
+Acceptance check: Review the complete command/order/administration/measurement graph with Pharmacy and Devices owners.
+
+Human decision: Joint owners must confirm the medication and device command workflow; no dose, drug choice or clinical action is recommended.
+
+Depends on: None
+
+#### M06 \| P2 \| Question: Make monitoring traceability requirements consistent
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Device module use case E: interoperability versus implementation guidance
 
@@ -1330,7 +912,9 @@ Human decision: Devices and OO must choose the intended traceability requirement
 
 Depends on: None
 
-### M07 \| P2 \| Question: Clarify nutrition measurements, assessments and diagnoses
+#### M07 \| P2 \| Question: Clarify nutrition measurements, assessments and diagnoses
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Nutrition module clinical scenarios
 
@@ -1354,7 +938,9 @@ Human decision: Nutrition and OO owners must approve the intended assessment wor
 
 Depends on: None
 
-### M08 \| P2 \| Correction: Remove the false universal claim about mandatory profiles
+#### M08 \| P2 \| Correction: Remove the false universal claim about mandatory profiles
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Medication Definition module: profiling comparison
 
@@ -1378,33 +964,11 @@ Human decision: Editorial approval; no new design decision required.
 
 Depends on: None
 
-### M09 \| P3 \| Suggestion: Make grouping diagrams readable and domain-neutral
+### Cross-layer findings
 
-Location: Diagnostics grouping prose and parent-child diagrams
+#### X01 \| P1 \| Correction: Remove unsupported genomic reference paths
 
-Evidence: The grouping explanation centers on a patient at one point in time even though Observation supports non-patient subjects and periods. The microbiology diagram needs a clearer distinction between a result-bearing organism parent and a pure susceptibility grouper.
-
-Evidence sources: DIAG, GROUP1, GROUP2, GROUP3, DEF
-
-Proposed change: Refine captions and legends, preserving both approved grouping patterns.
-
-Replacement / minimum content:
-
-```
-Use subject and clinically relevant time/period where patient-only wording is unnecessary. Explain Bundle as packaging, not a universal report requirement. Label pure organizers separately from result-bearing parents, clarify the apparent organism self-loop, and remove spell-check underlines from publication artwork.
-```
-
-Rationale: Helps non-laboratory implementers understand the patterns without mistaking diagram shorthand for constraints.
-
-Acceptance check: Have a non-laboratory reviewer follow the diagram legend and inspect the final exported artwork.
-
-Human decision: Editorial approval; no new design decision required.
-
-Depends on: X02, M01
-
-## Cross-layer findings
-
-### X01 \| P1 \| Correction: Remove unsupported genomic reference paths
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Genomic Reporting notes; Diagnostics resource map and legend
 
@@ -1428,7 +992,9 @@ Human decision: OO and Clinical Genomics must choose the supported package-speci
 
 Depends on: None
 
-### X02 \| P1 \| Correction: Apply organizer constraints consistently across panels and absence guidance
+#### X02 \| P1 \| Correction: Apply organizer constraints consistently across panels and absence guidance
+
+Change classification: Must fix \(implementation or testing impact\)
 
 Location: Cancellation notes; Vital Signs mandatory-data list; grouping notes and Diagnostics diagrams
 
@@ -1452,9 +1018,571 @@ Human decision: OO should confirm panel lifecycle wording with D04; the current 
 
 Depends on: D04
 
-## Suggested missing examples
+## Minor fix
 
-### N01 \| P2 \| Missing example: Publish complete examples of both R6 grouping patterns
+### Documentation findings
+
+#### D06 \| P3 \| Correction: Repair local wording and duplicated definitions
+
+Change classification: Minor fix
+
+Location: Notes on subject, components, coded results, NaN and reference ranges; component.value\[x\].comment; Scope temperature link
+
+Evidence: The prose says two attributes then names three; says one performer despite performer 0..\*; implies a base binding on valueCodeableConcept; names only valueCodeableConcept for NaN; and duplicates value-choice comments. The introductory temperature link leads to entered-in-error f202.
+
+Evidence sources: DOC, DEF, EX04, EX23
+
+Proposed change: Apply bounded copy edits without changing conformance strength.
+
+Replacement / minimum content:
+
+```
+Use "several elements" for specimen/bodyStructure/focus; "shared Observation-level context, including the same performer list" for components; "a profile or use case may specify an answer value set" for coded results; "value[x] is absent" for NaN; and "type, appliesTo and age" for distinguishing reference ranges. Remove the duplicate value-type bullets. Link the ordinary temperature illustration to observation-example-body-temperature.html.
+```
+
+Rationale: Makes the prose precise without requiring optional data or invalidating error-history examples.
+
+Acceptance check: Regenerate the notes and definitions; verify the linked ordinary temperature and retained entered-in-error example.
+
+Human decision: Editorial approval; no new design decision required.
+
+Depends on: None
+
+#### D09 \| P2 \| Question: Align the SNOMED concept-domain mapping with allowed coding patterns
+
+Change classification: Minor fix
+
+Location: Observation mappings: Observation.code; Notes on SNOMED CT patterns 3 and 4
+
+Evidence: The concept-domain mapping names observable entities/evaluation procedures, while the notes and abdominal-tenderness example also use clinical findings.
+
+Evidence sources: MAP, DOC, EX51
+
+Proposed change: Clarify whether the mapping is illustrative or intended to exclude other documented patterns.
+
+Replacement / minimum content:
+
+```
+Either label the mapping non-exhaustive and link the coding-pattern guidance, or revise the documented domain after terminology-owner review. Do not invalidate the clinical-finding pattern by inference.
+```
+
+Rationale: Mappings should not appear to contradict sanctioned examples.
+
+Acceptance check: Review each documented SNOMED pattern against the final mapping and example code systems.
+
+Human decision: Terminology and OO owners must confirm the mapping scope and any extension to its expression.
+
+Depends on: None
+
+### Examples findings
+
+#### E02 \| P1 \| Correction: Give timed Apgar scores distinct, birth-relative timestamps
+
+Change classification: Minor fix
+
+Location: The 1-, 2-, 5-, 10- and 20-minute Apgar examples: effectiveDateTime and contained Patient birthTime
+
+Evidence: All five observations share 2016-05-18T22:33:22Z. Each contained newborn has birthTime 2016-05-18T10:28:45Z, inconsistent with all five minute-specific codes.
+
+Evidence sources: EX31, EX32, EX33, EX34, EX35
+
+Proposed change: Synchronize observation times, newborn identity and narratives across the family.
+
+Replacement / minimum content:
+
+```
+If retaining the recorded birth time, use 10:29:45Z, 10:30:45Z, 10:33:45Z, 10:38:45Z and 10:48:45Z on 2016-05-18 for the respective scores. Otherwise approve a different birth time and derive all five times from it.
+```
+
+Rationale: The minute after birth is part of what these coded observations mean.
+
+Acceptance check: Calculate elapsed minutes from each contained birthTime and compare the code/display and narrative.
+
+Human decision: Owner must confirm whether the birth time or observation timeline is the intended fixture.
+
+Depends on: None
+
+#### E03 \| P1 \| Correction: Reconcile the 2-minute Apgar reflex answer and score
+
+Change classification: Minor fix
+
+Location: Observation/2minute-apgar-score: reflex-irritability component
+
+Evidence: LA6721-0 and its displayed response describe the same response scored 2 in the later examples, but this example assigns weight/local score 1 and text describing a lesser response. Its total of 5 follows the local weights.
+
+Evidence sources: EX32, EX33, EX34, EX35
+
+Proposed change: Make response code, display, free text, item weight and total mutually consistent.
+
+Replacement / minimum content:
+
+```
+If the intended response is the one-point reflex response, select its verified answer code and matching display. If LA6721-0 is intended, correct the score/weight and recompute the total. Regenerate the narrative in either case.
+```
+
+Rationale: A scoring example must not teach a contradictory code-to-score mapping.
+
+Acceptance check: Validate the chosen LOINC answer against its answer list, sum the component weights and compare the total.
+
+Human decision: A scoring/terminology reviewer must select the intended response; an unverified substitute code is not supplied.
+
+Depends on: None
+
+#### E04 \| P1 \| Correction: Correct the bone-density UCUM denominator
+
+Change classification: Minor fix
+
+Location: Observation/bmd: valueQuantity.code
+
+Evidence: The displayed unit is g/cm², but the UCUM code is g/cm-2. The negative exponent in the denominator changes the dimension. LOINC 24701-5 gives g/cm2 as an example UCUM unit.
+
+Evidence sources: EX38, UCUM, LOINCBMD
+
+Proposed change: Correct the machine-readable unit after confirming the stated areal-density intent.
+
+Replacement / minimum content:
+
+```
+Set valueQuantity.code to g/cm2; retain system http://unitsofmeasure.org and the g/cm² display. Preserve 0.887 only after confirming it is an areal-density value.
+```
+
+Rationale: The current code and display describe different dimensions.
+
+Acceptance check: Parse the UCUM code and verify mass per area; compare all published formats.
+
+Human decision: Confirm the existing numeric value and intended dimension; this report does not clinically interpret the result.
+
+Depends on: None
+
+#### E05 \| P1 \| Correction: Remove the future last-menstrual-period date
+
+Change classification: Minor fix
+
+Location: Observation/date-lastmp: effectiveDateTime and valueDateTime
+
+Evidence: The observation is effective 2016-01-24, but its last-menstrual-period value is 2016-12-30.
+
+Evidence sources: EX22
+
+Proposed change: Choose dates that fit the explicitly retrospective observation.
+
+Replacement / minimum content:
+
+```
+Use an owner-approved last-menstrual-period date on or before the assessment time, or move the assessment date to the intended later encounter. Update narrative and all serializations together.
+```
+
+Rationale: The current result is future information presented as a last event.
+
+Acceptance check: Assert valueDateTime &lt;= effectiveDateTime for this scenario.
+
+Human decision: Owner must choose the intended dates; no historical date is guessed.
+
+Depends on: None
+
+#### E08 \| P2 \| Question: Decide whether the IV-pump example measures volume or flow
+
+Change classification: Minor fix
+
+Location: Bundled Observation code, valueQuantity and focused DeviceMetric.type
+
+Evidence: The Observation code describes intravascular fluid intake over eight hours, its unit is mL/\(8.h\), and the metric describes pump flow. These may mix interval volume and flow-rate semantics.
+
+Evidence sources: EX10, DM
+
+Proposed change: Select one measurand and align code, metric, unit and effective period.
+
+Replacement / minimum content:
+
+```
+For accumulated eight-hour intake, use a compatible volume result and interval. For instantaneous or interval-normalized flow, use a verified flow-rate code and unit. Do not simply relabel the unit without resolving the intended quantity.
+```
+
+Rationale: Dimensional and temporal meaning matter more than whether the syntax parses.
+
+Acceptance check: Have device/terminology reviewers verify the chosen code-property-unit combination.
+
+Human decision: Devices and OO must decide the intended measurand.
+
+Depends on: D02
+
+#### E09 \| P2 \| Correction: Remove result interpretation from an unperformed blood pressure
+
+Change classification: Minor fix
+
+Location: Observation/blood-pressure-cancel: interpretation and component.dataAbsentReason
+
+Evidence: There are no numeric results, but interpretation is Low. The note says the order was cancelled; component absence reasons say not-asked.
+
+Evidence sources: EX15, DOC, STATUS
+
+Proposed change: Remove unsupported interpretation and align the absence explanation with the scenario.
+
+Replacement / minimum content:
+
+```
+Delete the Low interpretation. If the measurements were not performed because the order was cancelled, use the appropriate verified not-performed absence concept and explain cancellation with statusReason or note. Do not add invented measurements.
+```
+
+Rationale: An unperformed test does not establish low blood pressure.
+
+Acceptance check: Confirm both components remain present as required by the BP profile and carry consistent absence reasons.
+
+Human decision: Owner must confirm whether not-asked was intentional or an inherited placeholder.
+
+Depends on: D04
+
+#### E10 \| P2 \| Correction: Match eGFR reference-range population to the result code
+
+Change classification: Minor fix
+
+Location: Observation/f205: first component.code and component.referenceRange.appliesTo
+
+Evidence: The first component uses the Black-population MDRD concept 48643-1, but its reference-range population text says non-black. The second component uses non-Black concept 48642-3; the top-level code is the general MDRD concept 33914-3.
+
+Evidence sources: EX26, LOINCEGFR
+
+Proposed change: Align population labels and range applicability without silently changing the historical equation.
+
+Replacement / minimum content:
+
+```
+Confirm which population the first component represents and correct its code/display, referenceRange.appliesTo and narrative together. Keep the existing paired historical-method example only with explicit method/context; a modern equation would be a separate approved example.
+```
+
+Rationale: The result and its range currently describe different populations.
+
+Acceptance check: Check both result concepts, population labels and method wording against verified terminology.
+
+Human decision: Owner must choose the intended population and whether to retain this historical teaching case.
+
+Depends on: None
+
+#### E11 \| P2 \| Correction: Reconcile the sitting-MAP caption, category and dates
+
+Change classification: Minor fix
+
+Location: Observation/map-sitting and its example-index caption
+
+Evidence: The mean blood-pressure example uses laboratory category, is advertised as demonstrating body-position/delta extensions that are absent, and is final with issued time preceding the end of its effective period.
+
+Evidence sources: EX50, INDEX, VITAL
+
+Proposed change: Choose whether this is a point measurement or a derived temporal result and align all representations.
+
+Replacement / minimum content:
+
+```
+For a point-in-time MAP, use vital-signs categorization and coherent effective/issued times, and remove the unsupported extension claim. If a delta/temporal statistic is intended, supply its actual inputs, derivation and approved representation rather than keeping a misleading caption.
+```
+
+Rationale: The label, lifecycle and data should describe the same example.
+
+Acceptance check: Check chronology, claimed profile applicability and every advertised feature in the payload.
+
+Human decision: Owner must decide the intended MAP scenario; do not automatically apply a point-in-time profile to an aggregate.
+
+Depends on: D11
+
+#### E12 \| P2 \| Question: Review unusual clinical fixture values and ranges
+
+Change classification: Minor fix
+
+Location: Body-length example; f002 base excess; f005 hemoglobin
+
+Evidence: A 25 cm body length is attached to a patient who is an adult at the observation date. Base excess uses a 7.1-11.2 mmol/L range. Hemoglobin is already 7.2 g/dL, but its 7.5-10 g/dL reference interval needs provenance for this patient.
+
+Evidence sources: EX06, EX18, EX21, DEP04
+
+Proposed change: Have a clinical example owner verify the intended populations, units and reference intervals.
+
+Replacement / minimum content:
+
+```
+Use an appropriate synthetic subject/value pair for body length. For the two laboratory intervals, supply the intended method/population provenance or replace the fixtures with owner-approved internally consistent values. Do not replace them with a universal textbook interval.
+```
+
+Rationale: Unusual does not itself prove invalid; these require informed human review.
+
+Acceptance check: Record clinical approval and recheck demographics, units, flags and ranges together.
+
+Human decision: Clinical reviewers must decide the intended scenarios and intervals. There is no mmol/L-versus-g/dL serialization defect in f005.
+
+Depends on: None
+
+#### E13 \| P2 \| Correction: Make the vital-sign panel represent a coherent time
+
+Change classification: Minor fix
+
+Location: Observation/vitals-panel: effectiveDateTime and hasMember
+
+Evidence: The panel is dated 1999 and groups three 1999 vital signs with a blood-pressure observation from 2012.
+
+Evidence sources: EX14, EX02, EX03, EX04, EX11, VP
+
+Proposed change: Group observations from the intended encounter/time or clearly select another use case.
+
+Replacement / minimum content:
+
+```
+Use a compatible-time blood-pressure member for the 1999 point-in-time panel, or update the complete member set and panel time to a coherent encounter. Preserve organizer=true and at least two hasMember entries.
+```
+
+Rationale: A point-in-time teaching panel should not silently span thirteen years.
+
+Acceptance check: Resolve every member; compare subject and effective times with the panel profile.
+
+Human decision: Owner must select the intended measurement event.
+
+Depends on: None
+
+#### E14 \| P1 \| Correction: Use a gender-identity answer that matches the question
+
+Change classification: Minor fix
+
+Location: Observation/clinical-gender: code and valueCodeableConcept
+
+Evidence: LOINC 76691-5 asks about gender identity, but the answer uses SNOMED CT 191788006 with display Feminism in boy \(finding\), a different kind of assertion.
+
+Evidence sources: EX36, PATIENT
+
+Proposed change: Replace the mismatched answer and modernize the scenario wording.
+
+Replacement / minimum content:
+
+```
+Use an owner-approved synthetic self-reported gender-identity response with a verified answer concept and matching display/text. Do not infer gender identity from Patient.gender or reuse a behavioral finding as the answer.
+```
+
+Rationale: The current example misrepresents the question-answer semantics and can mislead implementers.
+
+Acceptance check: Verify the answer list/code and distinguish self-reported identity from administrative gender.
+
+Human decision: Terminology and clinical owners must select the intended synthetic response.
+
+Depends on: None
+
+#### E17 \| P2 \| Question: Explain incomplete blood-group panel membership
+
+Change classification: Minor fix
+
+Location: Observation/bgpanel: code and hasMember
+
+Evidence: The code describes blood type and indirect antibody screening, but members demonstrate only ABO and Rh status.
+
+Evidence sources: EX46, EX47, EX48
+
+Proposed change: Make explicit whether this is a partial panel or a complete panel demonstration.
+
+Replacement / minimum content:
+
+```
+Either label the example as a deliberately partial result set and explain missing/pending antibody-screen results, add a coherent antibody-screen member, or use a verified narrower panel code. If it is a pure grouper, demonstrate organizer=true consistently with X02.
+```
+
+Rationale: A partial result set can be valid; unexplained incompleteness is a teaching problem, not an automatic cardinality error.
+
+Acceptance check: Compare the approved panel meaning with every member and its lifecycle state.
+
+Human decision: Owner must choose complete versus intentionally partial panel semantics.
+
+Depends on: X02, E06
+
+#### E19 \| P2 \| Question: Resolve the herd assay scale and sampling date
+
+Change classification: Minor fix
+
+Location: Observation/herd1: valueQuantity, referenceRange.text and effectiveDateTime; pooled-serum specimen
+
+Evidence: The value uses percent while the sample/positive-control thresholds are written as fractions. The specimen collection date is 2017-11-14, but observation effectiveDateTime is 2017-11-20. A leading greater-than sign in Markdown also renders the positive threshold as a blockquote.
+
+Evidence sources: EX42, DOC, DEP16
+
+Proposed change: Confirm the assay convention and relevant time; rewrite the range prose without Markdown ambiguity.
+
+Replacement / minimum content:
+
+```
+State whether 0.2 means 0.2 percent or a ratio of 0.2, then align the unit and all thresholds. Use the specimen-collection time for physiologic relevance unless another meaning is explicitly justified. Write "Positive when the ratio is greater than ..." to preserve the comparison in the rendered narrative.
+```
+
+Rationale: A percentage/fraction mismatch can change interpretation by a factor of 100.
+
+Acceptance check: Check assay documentation, specimen timing and the rendered inequality text.
+
+Human decision: Assay owner must establish the actual scale and relevant date; no cutoff or numeric conversion is assumed.
+
+Depends on: None
+
+#### E20 \| P1 \| Correction: Rebuild the linked lipid report as one consistent dataset
+
+Change classification: Minor fix
+
+Location: Diagnostics-linked DiagnosticReport/lipid-panel-example and its four contained Observations
+
+Evidence: Patient/pat2 is Donald Duck, but the report/narrative names Wile E. Coyote. Narrative and structured dates differ. The report names a direct-LDL panel, while the LDL component is calculated; narrative LDL is 4.2 versus structured 4.6. HDL/LDL mass-concentration codes use mmol/L.
+
+Evidence sources: LIPIDREPORT, DIAG, DEP06
+
+Proposed change: Choose an internally coherent synthetic report, then regenerate the complete narrative.
+
+Replacement / minimum content:
+
+```
+Align patient identity, effective/issued dates, panel method, LDL value and component code-property-unit pairs. Resolve whether substance-concentration codes or converted mass values are intended. Preserve strict reference-limit meaning using the supported comparator where appropriate; do not let a narrative < or > become an inclusive structured limit.
+```
+
+Rationale: This linked teaching report has multiple mutually reinforcing identity and result inconsistencies.
+
+Acceptance check: Recalculate any derived LDL after the method decision; verify all four contained results, reference limits and every narrative cell.
+
+Human decision: Clinical and terminology owners must approve the intended dataset. Do not conflate this report with the six separate 2015 lipid examples.
+
+Depends on: None
+
+#### E21 \| P2 \| Correction: Make the CBC order and report match their listed results
+
+Change classification: Minor fix
+
+Location: diagnosticreport-example-f001-bloodexam Bundle: ServiceRequest/DiagnosticReport code and result list
+
+Evidence: The request and report use CBC code 58410-2, but results include glucose, base excess and carbon-dioxide partial pressure alongside erythrocytes and hemoglobin.
+
+Evidence sources: CBCREPORT, EX16, EX18, EX19, EX20, EX21
+
+Proposed change: Align order, report code and result membership.
+
+Replacement / minimum content:
+
+```
+Either demonstrate a genuine CBC with owner-approved CBC members, or use an appropriate verified code and caption for the mixed examination. Do not delete the valid standalone chemistry examples simply to repair this report.
+```
+
+Rationale: The order/report semantics should describe the measurements actually linked.
+
+Acceptance check: Resolve each result and compare its test concept with the chosen report and order.
+
+Human decision: The clinical example owner must choose the intended report type.
+
+Depends on: None
+
+## Net new addition
+
+### Documentation findings
+
+#### D07 \| P2 \| Suggestion: Explain the new contextual and device roles together
+
+Change classification: Net new addition
+
+Location: Notes 10.1.5.7 and device/anatomy guidance
+
+Evidence: The structure contains context, supportingDevice and bodyStructure, but the usage discussion does not adequately contrast these roles with existing relationships.
+
+Evidence sources: DOC, DEF
+
+Proposed change: Add a short role comparison and link a worked R6 example.
+
+Replacement / minimum content:
+
+```
+Contrast basedOn (request), partOf (containing event), derivedFrom (source evidence), triggeredBy (trigger), context (interpretive context), device (measurement device), supportingDevice (supporting equipment), and bodyStructure (coded or referenced anatomy). Show the actual R6 cardinalities and CodeableReference shape.
+```
+
+Rationale: Reduces the need to infer modeling intent from element names alone.
+
+Acceptance check: Check every role and example path against snapshot.element; do not imply that all roles must be populated.
+
+Human decision: Editorial approval; no new design decision required.
+
+Depends on: None
+
+### Examples findings
+
+#### E18 \| P2 \| Correction: Resolve the publication status of seven source-only examples
+
+Change classification: Net new addition
+
+Location: Pinned Observation source files not registered in the example catalog
+
+Evidence: Six alternate Apgar examples and body-height-merged are present in source but absent from the published index. The Apgar graph includes unresolved infant/component targets; body-height-merged is referenced by source Provenance examples. The alternate panel links to the adult 1999 heart-rate example. Its total-score file uses code 32411-1, also used for reflex irritability, and contains no result.
+
+Evidence sources: SO1, SO2, SO3, SO4, SO5, SO6, SO7, LISTSRC, PROVMERGE, PROVVERIFY, EX03
+
+Proposed change: Choose which files are intended for publication, then repair their graph and registration together.
+
+Replacement / minimum content:
+
+```
+For the six Apgar files, register and publish a complete, coherent family or explicitly retire obsolete teaching variants with reference cleanup. For body-height-merged, preserve its merge/Provenance scenario and ensure it and its merge-survivor patient are available wherever linked. Do not delete a referenced file solely because it is absent from the index. Before publishing apgar-panel, supply an actual same-newborn Apgar heart-rate member. Correct apgar-score to a verified total-score concept and result, and reconcile its contained newborn with the panel subject and birth-relative time.
+```
+
+Rationale: Source-only content must not be mistaken for a successfully published example.
+
+Acceptance check: Search source references before changing registration; build and follow every retained public target.
+
+Human decision: Owners must decide the intended publication status. These are source-only findings, not seven additional published-page defects.
+
+Depends on: E02, E06
+
+#### E23 \| P3 \| Suggestion: Add selective teaching context without inflating every minimal example
+
+Change classification: Net new addition
+
+Location: Laboratory f203/f204/f206, sampled-data ECG, non-HDL and existing minimal examples
+
+Evidence: Some teaching cases omit collection/result context; ECG leads share identical samples without explaining the synthetic waveform or amplitude scaling. Non-HDL has an unconditional treatment-goal statement. The base resource permits many omitted fields.
+
+Evidence sources: EX24, EX25, EX27, EX28, EX57, DEF
+
+Proposed change: Improve representative examples and explain deliberate simplifications.
+
+Replacement / minimum content:
+
+```
+Add meaningful time/specimen context to selected laboratory cases; prefer interoperable UCUM coding where appropriate without declaring all alternate units invalid. Explain the synthetic ECG signal and amplitude conversion/units. Qualify the non-HDL goal as an illustrative, population-dependent statement or remove it. Retain focused eye-color, decimal-precision and multilingual examples.
+```
+
+Rationale: Examples should teach their intended concept without unsupported clinical generalizations or mandatory boilerplate.
+
+Acceptance check: Verify any added data clinically and structurally; confirm that no optional base element has been recast as required.
+
+Human decision: Owners decide which examples need fuller context; no new patient data or clinical reference values are supplied.
+
+Depends on: None
+
+### Module findings
+
+#### M09 \| P3 \| Suggestion: Make grouping diagrams readable and domain-neutral
+
+Change classification: Net new addition
+
+Location: Diagnostics grouping prose and parent-child diagrams
+
+Evidence: The grouping explanation centers on a patient at one point in time even though Observation supports non-patient subjects and periods. The microbiology diagram needs a clearer distinction between a result-bearing organism parent and a pure susceptibility grouper.
+
+Evidence sources: DIAG, GROUP1, GROUP2, GROUP3, DEF
+
+Proposed change: Refine captions and legends, preserving both approved grouping patterns.
+
+Replacement / minimum content:
+
+```
+Use subject and clinically relevant time/period where patient-only wording is unnecessary. Explain Bundle as packaging, not a universal report requirement. Label pure organizers separately from result-bearing parents, clarify the apparent organism self-loop, and remove spell-check underlines from publication artwork.
+```
+
+Rationale: Helps non-laboratory implementers understand the patterns without mistaking diagram shorthand for constraints.
+
+Acceptance check: Have a non-laboratory reviewer follow the diagram legend and inspect the final exported artwork.
+
+Human decision: Editorial approval; no new design decision required.
+
+Depends on: X02, M01
+
+### Suggested missing examples
+
+#### N01 \| P2 \| Missing example: Publish complete examples of both R6 grouping patterns
+
+Change classification: Net new addition
 
 Location: Observation index and Diagnostics grouping guidance
 
@@ -1478,7 +1606,9 @@ Human decision: OO selects the approved clinical fixture and decides whether bot
 
 Depends on: X02, E20, E21
 
-### N02 \| P2 \| Missing example: Demonstrate triggeredBy with a reflex/additional-testing chain
+#### N02 \| P2 \| Missing example: Demonstrate triggeredBy with a reflex/additional-testing chain
+
+Change classification: Net new addition
 
 Location: Observation.triggeredBy and Diagnostics additional-testing guidance
 
@@ -1502,7 +1632,9 @@ Human decision: OO selects the trigger scenario and its terminology.
 
 Depends on: M01
 
-### N03 \| P2 \| Missing example: Show exception statusReason and correction history
+#### N03 \| P2 \| Missing example: Show exception statusReason and correction history
+
+Change classification: Net new addition
 
 Location: Observation lifecycle examples
 
@@ -1526,7 +1658,9 @@ Human decision: OO must approve the lifecycle distinctions and synthetic values.
 
 Depends on: D04, X02, M02
 
-### N04 \| P2 \| Missing example: Exercise the new R6 contextual and supporting-device elements
+#### N04 \| P2 \| Missing example: Exercise the new R6 contextual and supporting-device elements
+
+Change classification: Net new addition
 
 Location: Observation.context, supportingDevice and bodyStructure
 
@@ -1550,7 +1684,9 @@ Human decision: OO/Devices select a plausible scenario and approve supporting-de
 
 Depends on: D07, D02
 
-### N05 \| P3 \| Missing example: Illustrate coded normal values and result attachments
+#### N05 \| P3 \| Missing example: Illustrate coded normal values and result attachments
+
+Change classification: Net new addition
 
 Location: Observation.referenceRange.normalValue and valueAttachment
 
@@ -1574,7 +1710,9 @@ Human decision: OO selects appropriate examples and settles normalValue semantic
 
 Depends on: D08
 
-### N06 \| P3 \| Missing example: Show an R6 product subject and device-setting history
+#### N06 \| P3 \| Missing example: Show an R6 product subject and device-setting history
+
+Change classification: Net new addition
 
 Location: Observation.subject target expansion; Device/BDP/Nutrition module roles
 
@@ -1618,7 +1756,7 @@ Published narrative/reference review: failed. Inspected every indexed HTML narra
 
 Module visual review: passed. Visually inspected 11 relevant diagrams: eight Diagnostics figures, DeviceModule.svg and two Biologically Derived Product workflows. Semantic corrections are listed separately; inspection success does not mean the diagrams are correct.
 
-DOCX visual QA: passed. All 49 pages rendered with render\_docx.py/LibreOffice and visually inspected. A split replacement label was repaired. Final pages and Markdown/Word text parity were rechecked; internal QA is retained.
+DOCX visual QA: passed. All 51 pages were rendered and visually inspected; Markdown/Word content parity and classification coverage passed.
 
 ## Publication acceptance checklist
 

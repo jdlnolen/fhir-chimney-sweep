@@ -30,6 +30,10 @@ class PackagingTests(unittest.TestCase):
                 self.assertEqual(entry['policy']['installation'], 'AVAILABLE')
             self.assertEqual((ROOT / source).resolve(), PLUGIN.resolve())
 
+        marketplace = json.loads((ROOT / '.claude-plugin/marketplace.json').read_text())
+        manifest = json.loads((PLUGIN / '.claude-plugin/plugin.json').read_text())
+        self.assertEqual(marketplace['metadata']['version'], manifest['version'])
+
     def test_packaged_references_are_self_contained(self):
         import re
         for path in (PLUGIN / 'skills').rglob('*.md'):

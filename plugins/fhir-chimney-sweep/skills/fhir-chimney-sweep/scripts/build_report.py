@@ -17,10 +17,22 @@ from urllib.parse import urlsplit
 
 AREAS = ('Documentation', 'Examples', 'Module', 'Cross-layer')
 KINDS = ('Correction', 'Suggestion', 'Question', 'Missing example')
+CHANGE_CLASSIFICATIONS = (
+    'Must fix (implementation or testing impact)',
+    'Minor fix',
+    'Net new addition',
+)
+FINDING_SECTIONS = (
+    'Documentation findings',
+    'Examples findings',
+    'Module findings',
+    'Cross-layer findings',
+    'Suggested missing examples',
+)
 CHECKS = ('FHIR validator', 'Publisher', 'Terminology', 'Semantic review', 'DOCX visual QA')
 META = ('resource', 'fhir_version', 'package', 'build_url', 'source_revision',
         'review_date', 'scope', 'summary', 'recommendation')
-FINDING_TEXT = ('id', 'area', 'kind', 'priority', 'title', 'location', 'evidence',
+FINDING_TEXT = ('id', 'area', 'kind', 'priority', 'change_classification', 'title', 'location', 'evidence',
                 'proposed_change', 'replacement', 'rationale', 'validation', 'decision')
 
 
@@ -90,10 +102,14 @@ def validate_report(data):
             raise ValueError('Unknown or absent finding source IDs')
         if row['area'] not in AREAS or row['kind'] not in KINDS or row['priority'] not in ('P1', 'P2', 'P3'):
             raise ValueError('Invalid finding area, kind, or priority')
+        if row['change_classification'] not in CHANGE_CLASSIFICATIONS:
+            raise ValueError('Invalid finding change classification')
         if row['priority'] == 'P1' and row['kind'] != 'Correction':
             raise ValueError('P1 is reserved for demonstrated Corrections')
         if row['kind'] == 'Missing example' and row['area'] != 'Examples':
             raise ValueError('Missing example findings belong to Examples')
+        if row['kind'] == 'Missing example' and row['change_classification'] != 'Net new addition':
+            raise ValueError('Missing example findings are Net new additions')
     findings = unique(data['findings'], 'id')
     graph = {row['id']: row['dependencies'] for row in data['findings']}
     visited, active = set(), set()
@@ -147,6 +163,17 @@ def validate_report(data):
             raise ValueError('Clean recommendation requires a completed semantic review')
 
 
+def finding_section(finding):
+    if finding['kind'] == 'Missing example':
+        return 'Suggested missing examples'
+    return f'{finding["area"]} findings'
+
+
+def finding_id_key(finding):
+    parts = re.findall(r'\d+|\D+', finding['id'])
+    return tuple((0, int(part)) if part.isdigit() else (1, part.casefold()) for part in parts)
+
+
 def content_blocks(data):
     validate_report(data)
     blocks = []
@@ -165,8 +192,37 @@ def content_blocks(data):
     add('p', data['summary'])
     counts = Counter(f['priority'] for f in data['findings'])
     kinds = Counter(f['kind'] for f in data['findings'])
+    classifications = Counter(f['change_classification'] for f in data['findings'])
     add('p', 'Triage: ' + '; '.join(f'{k}: {counts[k]}' for k in ('P1', 'P2', 'P3')) + '. ' +
         '; '.join(f'{k}: {kinds[k]}' for k in KINDS) + '.')
+    add('h1', 'Change classification')
+    add('table', [
+        ('Class', 'Meaning', 'Count', 'Publication action'),
+        (
+            'Must fix (implementation or testing impact)',
+            'Existing content conflicts with structure, conformance rules, reference or operation semantics, resource boundaries, or implementation/test guidance.',
+            str(classifications['Must fix (implementation or testing impact)']),
+            'Resolve before publication so implementers and test authors can rely on the specification.',
+        ),
+        (
+            'Minor fix',
+            'Existing content has a clinical-plausibility, dataset, chronology, wording, terminology, link, or caption issue without material implementation/test impact.',
+            str(classifications['Minor fix']),
+            'Correct as publication cleanup; do not treat it as mission critical.',
+        ),
+        (
+            'Net new addition',
+            'New explanatory material, diagram work, publication coverage, or example content.',
+            str(classifications['Net new addition']),
+            'Add if accepted; absence alone is not an existing-content defect.',
+        ),
+    ])
+    add('p', 'Change classification is separate from finding type and P1/P2/P3 priority. '
+        'Must fix is reserved for content that materially impairs implementation or test design; '
+        'clinical plausibility and internally inconsistent example data are minor fixes unless the '
+        'same finding also contains a structural, conformance, reference, operation, or workflow blocker.')
+    add('p', 'Detailed findings are organized first by change classification, then by area, '
+        'then by numeric finding ID within that area.')
     add('h1', 'Scope and review boundary')
     add('p', data['scope'])
     add('p', 'Advisory change list only. No FHIR source was modified by this sweep. '
@@ -177,23 +233,31 @@ def content_blocks(data):
         (r['area'], r['artifact'], r['status'], ', '.join(r['finding_ids']) or 'None') for r in data['inventory']])
     for row in data['inventory']:
         add('meta', f'{row["area"]} / {row["artifact"]}: {row["note"]} Sources: {", ".join(row["source_ids"]) or "None available"}.')
-    sections = [(f'{a} findings', [f for f in data['findings'] if f['area'] == a and f['kind'] != 'Missing example']) for a in AREAS]
-    sections.append(('Suggested missing examples', [f for f in data['findings'] if f['kind'] == 'Missing example']))
-    for title, rows in sections:
-        add('h1', title)
-        if not rows:
-            add('p', 'No findings recorded for this section. See inventory and limitations for actual coverage.')
-        for f in sorted(rows, key=lambda item: item['priority']):
-            add('h2', f'{f["id"]} | {f["priority"]} | {f["kind"]}: {f["title"]}')
-            for label, key in [('Location', 'location'), ('Evidence', 'evidence')]:
-                add('p', f'{label}: {f[key]}')
-            add('meta', 'Evidence sources: ' + ', '.join(f['source_ids']))
-            add('p', 'Proposed change: ' + f['proposed_change'])
-            add('p', 'Replacement / minimum content:')
-            add('code', f['replacement'])
-            for label, key in [('Rationale', 'rationale'), ('Acceptance check', 'validation'), ('Human decision', 'decision')]:
-                add('p', f'{label}: {f[key]}')
-            add('meta', 'Depends on: ' + (', '.join(f['dependencies']) or 'None'))
+    if not data['findings']:
+        add('h1', 'Detailed findings')
+        add('p', 'No findings recorded. See inventory and limitations for actual coverage.')
+    for classification in CHANGE_CLASSIFICATIONS:
+        classified = [f for f in data['findings'] if f['change_classification'] == classification]
+        if not classified:
+            continue
+        add('h1', classification)
+        for section in FINDING_SECTIONS:
+            rows = [f for f in classified if finding_section(f) == section]
+            if not rows:
+                continue
+            add('h2', section)
+            for f in sorted(rows, key=finding_id_key):
+                add('h3', f'{f["id"]} | {f["priority"]} | {f["kind"]}: {f["title"]}')
+                add('meta', 'Change classification: ' + f['change_classification'])
+                for label, key in [('Location', 'location'), ('Evidence', 'evidence')]:
+                    add('p', f'{label}: {f[key]}')
+                add('meta', 'Evidence sources: ' + ', '.join(f['source_ids']))
+                add('p', 'Proposed change: ' + f['proposed_change'])
+                add('p', 'Replacement / minimum content:')
+                add('code', f['replacement'])
+                for label, key in [('Rationale', 'rationale'), ('Acceptance check', 'validation'), ('Human decision', 'decision')]:
+                    add('p', f'{label}: {f[key]}')
+                add('meta', 'Depends on: ' + (', '.join(f['dependencies']) or 'None'))
     add('h1', 'Verification performed')
     for row in data['checks']:
         add('p', f'{row["name"]}: {row["status"]}. {row["details"]}')
@@ -232,7 +296,7 @@ def render_markdown(blocks):
             fence = '`' * max(3, max((len(s) + 1 for s in re.findall(r'`+', value)), default=3))
             result.append(f'{fence}\n{value}\n{fence}')
         else:
-            prefix = {'title': '# ', 'h1': '## ', 'h2': '### ', 'bullet': '- '}.get(kind, '')
+            prefix = {'title': '# ', 'h1': '## ', 'h2': '### ', 'h3': '#### ', 'bullet': '- '}.get(kind, '')
             result.append(prefix + escape_md(value))
         result.append('')
     return '\n'.join(result)
@@ -349,6 +413,7 @@ def render_docx(blocks, path):
                             run.bold = True
                 if i == 0:
                     table.rows[i]._tr.get_or_add_trPr().append(element('tblHeader'))
+                table.rows[i]._tr.get_or_add_trPr().append(element('cantSplit'))
         elif kind == 'link':
             p = doc.add_paragraph(style='Sweep Metadata')
             p.paragraph_format.keep_with_next = True
@@ -365,8 +430,10 @@ def render_docx(blocks, path):
             link.append(run)
             p._p.append(link)
         else:
-            style = {'title': 'Title', 'h1': 'Heading 1', 'h2': 'Heading 2', 'meta': 'Sweep Metadata', 'code': 'Sweep Code', 'bullet': 'Sweep Bullet'}.get(kind, 'Normal')
+            style = {'title': 'Title', 'h1': 'Heading 1', 'h2': 'Heading 2', 'h3': 'Heading 3', 'meta': 'Sweep Metadata', 'code': 'Sweep Code', 'bullet': 'Sweep Bullet'}.get(kind, 'Normal')
             p = doc.add_paragraph(value, style=style)
+            if kind == 'meta' and value.startswith('Change classification:'):
+                p.paragraph_format.keep_with_next = True
             if kind == 'bullet':
                 np = element('numPr')
                 np.append(element('ilvl', val=0))

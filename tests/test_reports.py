@@ -8,6 +8,8 @@ from unittest.mock import patch
 import zipfile
 from xml.etree import ElementTree as ET
 
+from docx import Document
+
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "plugins/fhir-chimney-sweep/skills/fhir-chimney-sweep"
 spec = importlib.util.spec_from_file_location("report", SKILL / "scripts/build_report.py")
@@ -34,7 +36,41 @@ class ReportTests(unittest.TestCase):
                     widths = [int(e.attrib['{' + ns['w'] + '}w']) for e in table.findall("w:tblGrid/w:gridCol", ns)]
                     self.assertEqual(sum(widths), 9360)
                     self.assertEqual(table.find("w:tblPr/w:tblW", ns).attrib['{' + ns['w'] + '}w'], "9360")
+                finding = next(p for p in Document(docx).paragraphs if p.text.startswith('EX-01 |'))
+                self.assertEqual(finding.style.name, 'Heading 3')
             self.assertEqual(len(list(Path(folder).iterdir())), 2)
+
+    def test_findings_are_grouped_by_classification_area_and_number(self):
+        def finding(identifier, area, classification):
+            item = copy.deepcopy(self.data['findings'][0])
+            item['id'] = identifier
+            item['area'] = area
+            item['change_classification'] = classification
+            item['dependencies'] = []
+            return item
+
+        self.data['findings'] = [
+            finding('D10', 'Documentation', 'Minor fix'),
+            self.data['findings'][1],
+            finding('E03', 'Examples', 'Minor fix'),
+            self.data['findings'][0],
+            finding('D02', 'Documentation', 'Minor fix'),
+        ]
+        headings = [block for block in report.content_blocks(self.data) if block[0] in ('h1', 'h2', 'h3')]
+        start = headings.index(('h1', 'Must fix (implementation or testing impact)'))
+        self.assertEqual(headings[start:start + 10], [
+            ('h1', 'Must fix (implementation or testing impact)'),
+            ('h2', 'Examples findings'),
+            ('h3', 'EX-01 | P1 | Correction: Required status is absent (synthetic)'),
+            ('h1', 'Minor fix'),
+            ('h2', 'Documentation findings'),
+            ('h3', 'D02 | P1 | Correction: Required status is absent (synthetic)'),
+            ('h3', 'D10 | P1 | Correction: Required status is absent (synthetic)'),
+            ('h2', 'Examples findings'),
+            ('h3', 'E03 | P1 | Correction: Required status is absent (synthetic)'),
+            ('h1', 'Net new addition'),
+        ])
+        self.assertIn('#### EX-01 \\| P1 \\| Correction:', report.render_markdown(report.content_blocks(self.data)))
 
     def test_no_overwrite_or_partial_output(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -78,6 +114,15 @@ class ReportTests(unittest.TestCase):
     def test_suggestions_are_not_blockers(self):
         self.data['findings'][0]['kind'] = 'Suggestion'
         with self.assertRaisesRegex(ValueError, 'P1'):
+            report.validate_report(self.data)
+
+    def test_change_classification_is_validated(self):
+        self.data['findings'][0]['change_classification'] = 'Critical'
+        with self.assertRaisesRegex(ValueError, 'change classification'):
+            report.validate_report(self.data)
+        self.data = json.loads((SKILL / "assets/example-review.json").read_text())
+        self.data['findings'][1]['change_classification'] = 'Minor fix'
+        with self.assertRaisesRegex(ValueError, 'Net new'):
             report.validate_report(self.data)
 
     def test_safe_metadata_and_urls(self):
